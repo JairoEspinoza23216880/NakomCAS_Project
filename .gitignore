@@ -1,0 +1,16 @@
+# Ignorar dependencias y logs de Node (para Astro)
+frontend/node_modules/
+frontend/dist/
+frontend/.astro/
+frontend/.env
+frontend/npm-debug.log*
+
+# Ignorar dependencias y logs de PHP (para Slim/Eloquent)
+backend/vendor/
+backend/.env
+backend/composer.lock
+backend/logs/
+
+# Ignorar archivos del OS
+.DS_Store
+Thumbs.db
