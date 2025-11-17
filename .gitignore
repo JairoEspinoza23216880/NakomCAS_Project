@@ -4,7 +4,6 @@ frontend/dist/
 frontend/.astro/
 frontend/.env
 frontend/npm-debug.log*
-frontend/.vscode/
 
 # Ignorar dependencias y logs de PHP (para Slim/Eloquent)
 backend/vendor/
