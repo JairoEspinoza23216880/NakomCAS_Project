@@ -11,10 +11,14 @@
             "id": "d276696a115b51d9",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "docs/Reglas para uso de Github.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Nueva pestaña"
+              "title": "Reglas para uso de Github"
             }
           }
         ]
@@ -90,7 +94,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "collapseAll": false,
+                "file": "docs/Reglas para uso de Github.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Enlaces entrantes"
+              "title": "Enlaces entrantes de Reglas para uso de Github"
             }
           },
           {
@@ -150,20 +155,21 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "docs/Reglas para uso de Github.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Esquema"
+              "title": "Esquema de Reglas para uso de Github"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -177,5 +183,11 @@
     }
   },
   "active": "d276696a115b51d9",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "docs/Configuración de Computadoras.md",
+    "docs/Reglas para uso de Github.md",
+    "docs/Diseño de la Base de Datos.md",
+    "docs/Requerimientos No Funcionales.md",
+    "docs/Requerimientos Funcionales.md"
+  ]
 }
