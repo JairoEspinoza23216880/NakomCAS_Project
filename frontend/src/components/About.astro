@@ -1,0 +1,31 @@
+---
+import Card from "./Card.astro";
+
+const cards = [
+  {
+    title: "Facil y Accesible",
+    description: "No necesitas conocimientos técnicos. Nuestro configurador te guía paso a paso",
+    image: "/img/facil.png"
+  },
+  {
+    title: "Ajustado a tu presupuesto",
+    description: "Configura tu equipo según tus necesidades y capacidad económica",
+    image: "/img/presupuesto.png"
+  },
+  {
+    title: "Personalizado",
+    description: "Cada equipo se ensambla específicamente para tu uso: gaming, trabajo o personal.",
+    image: "/img/personalizado.png"
+  }
+]
+---
+
+<section class="py-20" id="About">
+    <h1 class="text-5xl font-bold text-gray-900 text-center pb-10">¿Porque deberias elegirnos?</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
+        {cards.map((card) => (
+            <Card title={card.title} description={card.description} image={card.image} />
+        ))}
+    </div>
+</section>
