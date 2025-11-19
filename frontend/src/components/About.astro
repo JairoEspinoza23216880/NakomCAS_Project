@@ -5,27 +5,36 @@ const cards = [
   {
     title: "Facil y Accesible",
     description: "No necesitas conocimientos técnicos. Nuestro configurador te guía paso a paso",
-    image: "/img/facil.png"
+    image: "/img/facil.png",
   },
   {
     title: "Ajustado a tu presupuesto",
     description: "Configura tu equipo según tus necesidades y capacidad económica",
-    image: "/img/presupuesto.png"
+    image: "/img/presupuesto.png",
   },
   {
     title: "Personalizado",
     description: "Cada equipo se ensambla específicamente para tu uso: gaming, trabajo o personal.",
-    image: "/img/personalizado.png"
+    image: "/img/personalizado.png",
   }
 ]
 ---
 
-<section class="py-20" id="About">
+<section class="pt-20" id="About">
     <h1 class="text-5xl font-bold text-gray-900 text-center pb-10">¿Porque deberias elegirnos?</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
         {cards.map((card) => (
-            <Card title={card.title} description={card.description} image={card.image} />
+            <Card title={card.title} description={card.description} image={card.image}/>
         ))}
     </div>
 </section>
+
+<div class="p-5 text-center">
+    <a href="/configurations" class="inline-flex items-center px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+        Empieza Ahora
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+    </a>
+</div>

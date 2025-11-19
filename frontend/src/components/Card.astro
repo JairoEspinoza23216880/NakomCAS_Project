@@ -8,13 +8,16 @@ export interface Props {
 const { title, description, image } = Astro.props;
 ---
 
-<div class="max-w-80 mx-auto rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300">
-    <div class="w-24 h-24 bg-linear-to-br from-gray-300 to-gray-600 rounded-full flex items-center justify-center overflow-hidden mx-auto m-5">
-        <img src={image} class="h-15 w-15 invert"/>
+<div class="group max-w-80 mx-auto rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div class="w-24 h-24 rounded-full bg-linear-to-br from-gray-100 to-gray-300 flex items-center justify-center mx-auto transition-all">
+        <img src={image} class="h-12 w-12 opacity-80 hover:opacity-100 transition" />
     </div>
-    <div class="p-4 text-center">
-        <h2 class="text-3xl font-semibold text-gray-900 pb-5">{title}</h2>
-        <p class="text-1xl font-medium text-gray-800 mx-auto px-5">{description}</p>
+    <div class="mt-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-900 tracking-tight group-hover:text-gray-700 transition">
+            {title}
+        </h2>
+        <p class="mt-3 text-gray-600 text-base leading-relaxed px-3">
+            {description}
+        </p>
     </div>
 </div>
-

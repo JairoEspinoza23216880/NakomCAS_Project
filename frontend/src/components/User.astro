@@ -1,0 +1,38 @@
+---
+/* No se usa estado aquí, es JS del cliente */
+---
+
+<div id="user-menu-wrapper">
+  <!-- Botón -->
+  <button id="user-menu-button" class="items-center text-white rounded-xl">
+    <img src="/public/img/user.png" alt="imagen usuario" class="w-9 h-9 rounded-full mx-auto">
+    <!-- <span class="text-sm text-gray-800">usuario</span> -->
+  </button>
+
+  <!-- Menú -->
+  <div id="user-menu" class="hidden absolute right-0 mt-2 bg-white text-gray-700 rounded-xl shadow-lg border border-gray-200 z-10">
+    <a href="/Signup" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl">Registrarse</a>
+    <a href="/Login" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl">Iniciar sesión</a>
+  </div>
+</div>  
+
+<!-- JS para manejar el menú -->
+<script>
+  const btn = document.getElementById("user-menu-button");
+  const menu = document.getElementById("user-menu");
+  const wrapper = document.getElementById("user-menu-wrapper");
+
+  if (btn && menu && wrapper) {
+    btn.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
+
+    // cerrar al hacer clic fuera
+    document.addEventListener("click", (e: Event) => {
+      const target = e.target as Node;
+      if (!wrapper.contains(target)) {
+        menu.classList.add("hidden");
+      }
+    });
+  }
+</script>

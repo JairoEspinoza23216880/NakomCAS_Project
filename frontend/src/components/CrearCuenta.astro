@@ -1,0 +1,108 @@
+---
+const radioBase =
+    "px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200";
+const radioIdle = "bg-gray-100 text-gray-700 hover:bg-gray-200";
+const radioSelected = "bg-orange-500 text-white";
+---
+<!--
+El sistema debe presentar un formulario con los siguientes campos obligatorios:
+1. Nombre
+2. Apellido
+3. Correo Electrónico
+4. Teléfono (Whatsapp)
+5. Contraseña
+6. Repetir Contraseña
+-->
+<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Registrarse</h2>
+    <form action="/api/contacto" method="POST" class="space-y-6">
+        <div>
+            <label
+                for="name"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Nombre Completo</label
+            >
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Nombre Completo"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+        <!--
+        El sistema debe validar que el texto en el campo "Correo Electrónico" tenga un formato de email válido (ej. usuario@dominio.com).
+        -->
+        <div>
+            <label
+                for="email"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Correo Electrónico</label
+            >
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="correo@ejemplo.com"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+        <div>
+            <label
+                for="numberphone"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Teléfono</label
+            >
+            <input
+                type="tel"
+                id="numberphone"
+                name="numberphone"
+                placeholder="(999) 123-4567"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+        <!-- La Contraseña debe de verificarse que sea la misma -->
+        <div>
+            <label
+                for="password"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Contraseña</label
+            >
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Crea una contraseña segura"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+        <div>
+            <label
+                for="password"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Contraseña</label
+            >
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Confirma tu contraseña"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+        <button
+            type="submit"
+            class="w-full bg-orange-500 text-white px-4 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-200"
+        >
+            Crear Cuenta
+        </button>
+        <!--
+        Tras crear la cuenta exitosamente, el sistema debe mostrar un mensaje de éxito (ej. "¡Registro completado!") y redirigir al usuario a la página de "Iniciar Sesión".
+        -->
+    </form>
+</div>
