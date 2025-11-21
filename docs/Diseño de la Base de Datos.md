@@ -12,6 +12,7 @@
 | **status**        | `ENUM('Activo', 'Inactivo')`<br>`NOT NULL`<br>`DEFAULT 'Activo'` | Usado por el Vendedor para "desactivar" cuentas (`RF_AUS009`).                      |
 | **user_role_id**  | `TINYINT`<br>`NOT NULL`<br>`**FOREIGN KEY**`                     | Se conecta con la tabla `user_roles(id)`. Define si es Cliente o Vendedor.          |
 | **register_date** | `TIMESTAMP`<br>`DEFAULT CURRENT_TIMESTAMP`                       | (Buena práctica) Registra cuándo se creó la cuenta.                                 |
+
 #### user_roles
 | **Atributo** | **Tipo de Dato (MySQL)**                           | **Descripción / Restricciones**                                          |
 | ------------ | -------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -22,6 +23,7 @@
 | --- | ---------------------- |
 | 0   | Administrador/Vendedor |
 | 1   | Cliente                |
+
 #### components
 | **Atributo**          | **Tipo de Dato (MySQL)**                                         | **Descripción / Restricciones**                                                                                                                                            |
 | --------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,6 +34,7 @@
 | **stock**             | `INT`<br>`NOT NULL`<br>`DEFAULT 0`                               | La cantidad de unidades disponibles. El stock se actualiza manual o por scraping (`RF_ACP006`).                                                                            |
 | **tier**              | `INT`<br>`NOT NULL`<br>`DEFAULT 0`                               | **El valor clave para DANIEL.** El Vendedor asigna este valor (ej. 1-10) para que el sistema DANIEL pueda traducir las necesidades del cliente (ej. "1TB" -> `gama >= 5`). |
 | **status**            | `ENUM('Activo', 'Inactivo')`<br>`NOT NULL`<br>`DEFAULT 'Activo'` | Usado por el Vendedor para "desactivar" un componente y que no aparezca en las búsquedas (`RF_ACP007`).                                                                    |
+
 #### component_types
 | **Atributo**  | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                                                        |
 | ------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -52,6 +55,7 @@
 | 10  | Conectividad    |
 | 11  | Periférico      |
 
+
 #### functional_kits
 | **Atributo**   | **Tipo de Dato (MySQL)**                                         | **Descripción / Restricciones**                                                              |
 | -------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
@@ -62,6 +66,7 @@
 | **gpu_tier**   | `INT`<br>`NOT NULL`                                              | La gama abstracta de GPU (`RF_APC012`).                                                      |
 | **ram_tier**   | `INT`<br>`NOT NULL`                                              | La gama abstracta de RAM (`RF_APC012`).                                                      |
 | **status**     | `ENUM('Activo', 'Inactivo')`<br>`NOT NULL`<br>`DEFAULT 'Activo'` | Para que el Vendedor pueda ocultar este kit de las búsquedas de DANIEL.                      |
+
 #### structural_kits
 | **Atributo**         | **Tipo de Dato (MySQL)**                                         | **Descripción / Restricciones**                                                           |
 | -------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -70,6 +75,7 @@
 | **structural_price** | `DECIMAL(10, 2)`<br>`NOT NULL`                                   | El precio final del combo (Gabinete + Fans + Servicio), calculado en `RF_APC011`.         |
 | **case_tier**        | `INT`<br>`NOT NULL`                                              | La gama abstracta de Gabinete (ej. 1-10, donde 1="Sencillo", 10="Premium") (`RF_APC012`). |
 | **status**           | `ENUM('Activo', 'Inactivo')`<br>`NOT NULL`<br>`DEFAULT 'Activo'` | Para que el Vendedor pueda ocultar este combo de las búsquedas de DANIEL.                 |
+
 #### functional_kits_x_components
 | **Atributo**          | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                                 |
 | --------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -77,6 +83,7 @@
 | **component_id**      | `INT`<br>`NOT NULL`<br>`**FOREIGN KEY**`        | Se conecta con `components(id)`.                                                |
 | **quantity**          | `INT`<br>`NOT NULL`<br>`DEFAULT 1`              | La cantidad de esta pieza en el kit (ej. 2 para 2x8GB RAM) (`RF_APC007`).       |
 |                       | `PRIMARY KEY (functional_kit_id, component_id)` | `**PRIMARY KEY**` compuesta para asegurar que no se repita el mismo componente. |
+
 #### structural_kits_x_components
 | **Atributo**          | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                           |
 | --------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
@@ -84,6 +91,7 @@
 | **component_id**      | `INT`<br>`NOT NULL`<br>`**FOREIGN KEY**`        | Se conecta con `components(id)`.                                          |
 | **quantity**          | `INT`<br>`NOT NULL`<br>`DEFAULT 1`              | La cantidad de esta pieza (ej. 1 Gabinete, 3 Ventiladores) (`RF_APC007`). |
 |                       | `PRIMARY KEY (structural_kit_id, component_id)` | `**PRIMARY KEY**` compuesta.                                              |
+
 #### daniel_map_needs
 | **Atributo**          | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                                           |
 | --------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -109,6 +117,7 @@
 |             | Ciencia de Datos                          | 3                 | 4        | 5        | 4        |
 |             | Arquitectura e Ingeniería                 | 3                 | 4        | 3        | 4        |
 |             | Desarrollo de Videojuegos                 | 3                 | 2        | 2        | 2        |
+
 #### daniel_map_personalization
 | **Atributo**          | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                                                                           |
 | --------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -127,6 +136,7 @@
 |     | Pequeño | 2                 | 1    |
 |     | Mediano | 2                 | 2    |
 |     | Grande  | 2                 | 3    |
+
 #### daniel_map_boosters
 | **Atributo**      | **Tipo de Dato (MySQL)**                        | **Descripción / Restricciones**                                                    |
 | ----------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -170,7 +180,8 @@
 | **total_price** | `DECIMAL(10, 2)`<br>`NOT NULL`                                                                                                                                                                                                                                         | El precio final total (calculado por DANIEL en `RF_CPC008`) que el cliente aceptó pagar.                                                       |
 | **status**      | `ENUM(`<br>`'Pedido Recibido',`<br>`'Esperando Pago',`<br>`'Preparando Componentes',`<br>`'En Ensamblaje',`<br>`'Configuración y Pruebas',`<br>`'Listo para Entrega',`<br>`'Completado',`<br>`'Cancelado'`<br>`)`<br><br>`NOT NULL`<br>`DEFAULT 'Pedido Recibido'`<br> | El estado actual del pedido. (ej. 'Pedido Recibido', 'En Ensamblaje', 'Completado'). Este es el campo que el Vendedor actualiza (`RF_APD009`). |
 | **created_at**  | `TIMESTAMP`<br>`DEFAULT CURRENT_TIMESTAMP`                                                                                                                                                                                                                             | (Buena práctica) Registra la fecha y hora exactas en que se realizó el pedido.                                                                 |
-#### order_x_kits
+
+#### order_x_components
 | **Atributo**          | **Tipo de Dato (MySQL)**                 | **Descripción / Restricciones**                                                                                                                                                                          |
 | --------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **order_id**          | `INT`<br>`NOT NULL`<br>`**FOREIGN KEY**` | Se conecta con `Orders(id)`.                                                                                                                                                                             |
