@@ -1,0 +1,36 @@
+---
+---
+<section class="max-w-4xl mx-auto p-6">
+  <h1 class="text-3xl font-semibold mb-4">Configurador de PC</h1>
+  <a href="/InicioSesion">Inicio de Sesion</a>
+
+  <fieldset class="mb-6">
+    <legend class="font-medium">Área de trabajo</legend>
+    <div class="flex flex-wrap gap-4 mt-2">
+      <label><input type="checkbox" name="area" value="software"> Desarrollo de Software</label>
+      <label><input type="checkbox" name="area" value="datos"> Ciencia de Datos</label>
+      <label><input type="checkbox" name="area" value="ingenieria"> Arquitectura e Ingeniería</label>
+      <label><input type="checkbox" name="area" value="juegos"> Desarrollo de Videojuegos</label>
+    </div>
+  </fieldset>
+
+  <div class="mb-6">
+    <label for="nivelCarga" class="block font-medium">Nivel de carga</label>
+    <input type="range" id="nivelCarga" name="nivelCarga" min="1" max="3" class="w-full mt-2" />
+    <div class="flex justify-between text-sm">
+      <span>Entusiasta</span>
+      <span>Emprendedor</span>
+      <span>Profesional</span>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <label class="block font-medium">Programas específicos</label>
+    <input type="text" name="programas" placeholder="Ej. Blender, Photoshop, FL Studio"
+      class="border border-gray-300 rounded-lg p-2 w-full mt-2" />
+  </div>
+
+  <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+    Solicitar Ensamble
+  </button>
+</section>
