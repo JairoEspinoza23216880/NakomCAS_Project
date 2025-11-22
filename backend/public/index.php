@@ -16,6 +16,18 @@ require __DIR__ . '/../config/database.php';
 $app = AppFactory::create();
 
 // --- RUTAS DE TU API ---
+// Carga rutas desde archivos separados para mejor organización
+$authRoutes = require __DIR__ . '/../app/Routes/auth.php';
+$authRoutes($app);
+
+$configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
+$configRoutes($app);
+
+$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
+$adminRoutes($app);
+
+$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
+$ordersRoutes($app);
 
 /**
  * Ruta de Prueba: GET /api/hello
