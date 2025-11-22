@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "75fc81647be344ad",
+        "id": "c6de88c2e3a299a9",
         "type": "tabs",
         "children": [
           {
-            "id": "c19683fe3e3e4c20",
+            "id": "07c330f904d8fd83",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 248.5110321044922
   },
   "right": {
     "id": "493f593e83a2f71e",
@@ -169,7 +169,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 330.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -182,14 +182,24 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "c19683fe3e3e4c20",
+  "active": "07c330f904d8fd83",
   "lastOpenFiles": [
+    "backend/README_standard.md",
+    "backend/README_DEV.md",
+    "docs/Reglas para uso de Github.md",
+    "backend/app/Routes/orders.php",
+    "backend/app/Routes/admin.php",
+    "backend/app/Routes/configurator.php",
+    "backend/app/Routes/auth.php",
+    "backend/app/Models/DanielMapNeed.php",
+    "backend/app/Models/FunctionalKit.php",
+    "backend/app/Models/FunctionalKits",
+    "backend/app/Models/Kits",
+    "backend/app/Models/User.php",
+    "backend/README_composer.md",
+    "backend/sqlfiles/schema.sql",
     "docs/Diseño de la Base de Datos.md",
     "docs/Contrato API.md",
-    "docs/Reglas para uso de Github.md",
-    "backend/public/index.php",
-    "backend/config/database.php",
-    "backend/composer.json",
     "docs/Configuración de Computadoras.md",
     "docs/Requerimientos No Funcionales.md",
     "docs/Requerimientos Funcionales.md"

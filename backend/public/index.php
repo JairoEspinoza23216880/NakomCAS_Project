@@ -30,8 +30,8 @@ $ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
 $ordersRoutes($app);
 
 /**
- * Ruta de Prueba: GET /api/hello
- * (Cuando configures tu servidor, esta será tu-proyecto.com/api/hello)
+ * Ruta de Prueba: GET /hello
+ * (Cuando configures tu servidor, esta será tu-proyecto.com/hello)
  */
 $app->get('/hello', function (Request $request, Response $response, $args) {
     $data = ['message' => '¡Hola Mundo! El API de Slim está funcionando.'];
@@ -40,16 +40,15 @@ $app->get('/hello', function (Request $request, Response $response, $args) {
 });
 
 /**
- * Ruta de Prueba de BD: GET /api/test-db
+ * Ruta de Prueba de BD: GET /test-db
  * (Esta ruta intentará usar Eloquent para probar la conexión)
  */
 $app->get('/test-db', function (Request $request, Response $response, $args) {
     try {
         // Intenta hacer una consulta simple usando Eloquent
         // (Asume que tienes una tabla 'users')
-        $userCount = User::count(); 
+        $userCount = User::count();
         $data = ['message' => '¡Conexión a la BD exitosa!', 'user_count' => $userCount];
-
     } catch (\Exception $e) {
         // Si falla (ej. tabla no existe, credenciales mal)
         $data = ['error' => 'Error conectando a la BD', 'message' => $e->getMessage()];
