@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "c6de88c2e3a299a9",
+        "id": "c6992f5fd0e71688",
         "type": "tabs",
         "children": [
           {
-            "id": "07c330f904d8fd83",
+            "id": "447f7e36fb742b28",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/Reglas para uso de Github.md",
+                "file": "backend/app/Models/README_models.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Reglas para uso de Github"
+              "title": "README_models"
             }
           }
         ]
@@ -155,13 +155,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/Reglas para uso de Github.md",
+                "file": "backend/app/Models/README_models.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Esquema de Reglas para uso de Github"
+              "title": "Esquema de README_models"
             }
           }
         ],
@@ -182,11 +182,12 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "07c330f904d8fd83",
+  "active": "447f7e36fb742b28",
   "lastOpenFiles": [
+    "backend/app/Models/README_models.md",
+    "docs/Reglas para uso de Github.md",
     "backend/README_standard.md",
     "backend/README_DEV.md",
-    "docs/Reglas para uso de Github.md",
     "backend/app/Routes/orders.php",
     "backend/app/Routes/admin.php",
     "backend/app/Routes/configurator.php",

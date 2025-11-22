@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DanielMapNeed extends Model {
+class DanielMapNeed extends Model
+{
     protected $table = 'daniel_map_needs';
     public $timestamps = false;
 
     // Relación: Una necesidad tiene muchos boosters
-    public function boosters() 
+    public function boosters()
     {
         // Usamos la tabla pivote nueva que creamos
         return $this->belongsToMany(
