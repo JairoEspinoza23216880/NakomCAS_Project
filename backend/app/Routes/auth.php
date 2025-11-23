@@ -66,7 +66,8 @@ return function (App $app) {
         // Cargar la clave secreta del .env (o usar una por defecto si falla, aunque no debería)
         $secretKey = $_ENV['JWT_SECRET'] ?? 'clave_secreta_por_defecto_insegura';
         $issuedAt = time();
-        $expirationTime = $issuedAt + 3600 * 8; // El token expira en 8 horas
+        //$expirationTime = $issuedAt + 3600 * 8; // El token expira en 8 horas
+        $expirationTime = $issuedAt + 60 * 5; // Tiempo de Expiración para Pruebas
 
         $tokenPayload = [
             'iat' => $issuedAt,          // Cuándo se creó
@@ -167,6 +168,41 @@ return function (App $app) {
      * (Espacio reservado para PJDV)
      */
     $app->get('/api/me', function (Request $request, Response $response) {
-        // Espacio reservado para PJDV
-    });
+        // 1. Obtener datos del usuario autenticado desde el atributo 'user' inyectado por JwtMiddleware
+        $userData = $request->getAttribute('user');
+
+        if (!$userData) {
+            $payload = json_encode([
+                'success' => false,
+                'message' => 'No se pudo validar la sesión. Token inválido o no proporcionado.'
+            ]);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+        }
+
+        // 2. Buscar el usuario en la base de datos por ID
+        $user = \App\Models\User::find($userData->sub);
+        if (!$user) {
+            $payload = json_encode([
+                'success' => false,
+                'message' => 'Usuario no encontrado.'
+            ]);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        // Preparar respuesta con datos del usuario
+        $responseData = [
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => ($user->user_role_id == 1) ? 'admin' : 'client',
+                'status' => $user->status
+            ]
+        ];
+        $response->getBody()->write(json_encode($responseData));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    })->add(new \App\Middleware\JwtMiddleware());
 };
