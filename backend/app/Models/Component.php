@@ -17,7 +17,8 @@ class Component extends Model
         'price',
         'stock',
         'component_type_id',
-        'tier'
+        'tier',
+        'status'
     ];
 
     // Desactivar timestamps
@@ -25,7 +26,7 @@ class Component extends Model
 
 
     // RELACIONES
-    // Varios Componentes pertenecen varias Órdenes
+    // Varios Componentes pertenecen a varias Órdenes
     public function orders()
     {
         return $this->belongsToMany(Order::class, 'order_x_components')

@@ -25,7 +25,7 @@ class DanielMapNeed extends Model
     public $timestamps = false;
 
 
-    //RELACIONES
+    // RELACIONES
     // Una Necesidad pertenece a una Super Categoría
     public function superCategory()
     {
