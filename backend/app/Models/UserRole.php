@@ -15,6 +15,3 @@ class UserRole extends Model
         return $this->hasMany(User::class, 'user_role_id');
     }
 }
-{
-    // Aquí va el código del modelo UserRole
-}
