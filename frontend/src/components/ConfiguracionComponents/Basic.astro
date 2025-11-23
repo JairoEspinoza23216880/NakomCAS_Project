@@ -1,0 +1,106 @@
+<h2 class="text-center text-3xl font-bold text-gray-800 mb-2">
+  Configuración Básica
+</h2>
+<div class="flex flex-col gap-6">
+  <!-- ALMACENAMIENTO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">Almacenamiento</label
+    >
+    <select
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      name="Almacenamiento"
+      id="Almacenamiento"
+    >
+      <option value="" disabled selected class="text-gray-400">Selecciona una opción</option>
+      <option value="256GB" class="text-gray-900">256GB</option>
+      <option value="512GB" class="text-gray-900">512GB</option>
+      <option value="1TB" class="text-gray-900">1TB</option>
+      <option value="2TB" class="text-gray-900">2TB</option>
+      <option value="4TB" class="text-gray-900">4TB</option>
+    </select>
+  </div>
+
+  <!-- TAMAÑO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">Tamaño</label>
+    <select
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      name="tamanio"
+      id="tamanio"
+    >
+      <option value="" disabled selected class="text-gray-400"
+        >Selecciona una opción</option
+      >
+      <option value="compacto" class="text-gray-900">compacto</option>
+      <option value="Pequeño" class="text-gray-900">Pequeño</option>
+      <option value="Normal" class="text-gray-900">Normal</option>
+      <option value="Grande" class="text-gray-900">Grande</option>
+    </select>
+  </div>
+
+  <!-- CONECTIVIDAD -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">Conectividad</label>
+    <select
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      name="conectivitad"
+      id="conectivitad"
+    >
+      <option value="" disabled selected class="text-gray-400"
+        >Selecciona una opción</option
+      >
+      <option value="Solo Ethernet" class="text-gray-900">Solo Ethernet</option>
+      <option value="Wifi" class="text-gray-900">Wifi</option>
+      <option value="Bluetooth" class="text-gray-900">Bluetooth</option>
+    </select>
+  </div>
+
+  <!-- COMENTARIO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700"
+      >Comentario Adicional</label
+    >
+    <textarea
+      class="w-full mt-1 bg-gray-100 rounded-lg p-3 h-32 resize-none focus:ring-2 focus:ring-gray-200"
+      placeholder="Escribe tu comentario..."></textarea>
+    <div class="mt-3">
+      <button id="btnEnviar" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script is:raw>
+  (function () {
+    const btn = /** @type {HTMLButtonElement | null} */ (document.getElementById("btnEnviar"));
+    if (!btn) return;
+
+    btn.addEventListener("click", async () => {
+      const colorEl = /** @type {HTMLSelectElement | null} */ (document.getElementById("color"));
+      const sizeEl = /** @type {HTMLSelectElement | null} */ (document.getElementById("size"));
+      const connectivityEl = /** @type {HTMLSelectElement | null} */ (document.getElementById("connectivity"));
+      const textareaEl = /** @type {HTMLTextAreaElement | null} */ (document.querySelector("textarea"));
+
+      const almacenamiento = colorEl?.value ?? "";
+      const tamanio = sizeEl?.value ?? "";
+      const conectividad = connectivityEl?.value ?? "";
+      const comentario = textareaEl?.value ?? "";
+
+      const data = { almacenamiento, size, connectivity, comentario };
+
+      try {
+        const response = await fetch("https://swapi.dev/api/people/1", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        console.log("Respuesta de la API:", result);
+        alert("Datos enviados correctamente (simulado) ✅");
+      } catch (error) {
+        console.error("Error al conectar con la API:", error);
+        alert("Error al enviar los datos ❌");
+      }
+    });
+  })();
+</script>
+

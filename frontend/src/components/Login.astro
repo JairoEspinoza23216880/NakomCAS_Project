@@ -1,11 +1,18 @@
 ---
-
+let errorMessage = "";
 ---
 
 <section class="flex items-center justify-center min-h-screen bg-gray-900">
   <div class="bg-gray-800 text-gray-100 p-8 rounded-2xl shadow-2xl w-full max-w-sm">
     <h2 class="text-2xl font-semibold text-center mb-6">Login</h2>
-    <form action="/login" method="POST" class="space-y-5">
+
+    {errorMessage && (
+      <p class="bg-red-600 text-white p-2 rounded mb-3 text-center">
+        {errorMessage}
+      </p>
+    )}
+
+    <form id="loginForm" class="space-y-5">
       <div>
         <label for="username" class="block text-sm font-medium mb-1">Nombre</label>
         <input
@@ -32,8 +39,58 @@
         type="submit"
         class="w-full py-2 bg-gray-100 text-gray-900 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
       >
-        Registrarse
+        Iniciar Sesión
       </button>
     </form>
   </div>
 </section>
+
+<script is:raw>
+    (function () {
+        const form = /** @type {HTMLFormElement | null} */ (document.getElementById("loginForm"));
+        if (!form) return;
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const usernameEl = /** @type {HTMLInputElement | null} */ (document.getElementById("username"));
+            const passwordEl = /** @type {HTMLInputElement | null} */ (document.getElementById("password"));
+
+            const username = usernameEl?.value ?? "";
+            const password = passwordEl?.value ?? "";
+
+            if (!username || !password) {
+                alert("Por favor completa todos los campos");
+                return;
+            }
+
+            try {
+                // Llamada a tu API (reemplaza con tu endpoint real)
+                const API_URL = "https://tu-backend.com"; // cambiar a la url
+                const response = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.message || "Error en la petición");
+                }
+
+                const result = await response.json();
+
+                // Guardar token si lo devuelve la API
+                if (result.token) {
+                    localStorage.setItem("token", result.token);
+                }
+
+                alert("Login exitoso!");
+                window.location.href = "/configurator";
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error desconocido";
+                alert("Error: " + msg);
+            }
+        });
+    })();
+</script>

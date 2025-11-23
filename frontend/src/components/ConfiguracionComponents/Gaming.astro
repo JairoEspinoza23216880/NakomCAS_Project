@@ -1,0 +1,178 @@
+---
+/* No necesitas imports para esto, solo HTML + JS */
+---
+<h2 class="text-2xl font-bold mb-5">Tipo de Juego</h2>
+
+<section class="flex flex-col md:flex-row items-start justify-center gap-10 p-10">
+
+  <!-- Columna izquierda -->
+    <div>
+
+        <div class="flex flex-col gap-4">
+        <button 
+            class="tipo-btn px-6 py-2 bg-gray-300 text-gray-900 rounded-lg font-semibold hover:bg-gray-400"
+            data-tipo="Indies"
+        >Indies</button>
+
+        <button 
+            class="tipo-btn px-6 py-2 bg-gray-300 text-gray-900 rounded-lg font-semibold hover:bg-gray-400"
+            data-tipo="E-sport"
+        >E-sport</button>
+
+        <button 
+            class="tipo-btn px-6 py-2 bg-gray-300 text-gray-900 rounded-lg font-semibold hover:bg-gray-400"
+            data-tipo="AAA"
+        >AAA</button>
+        </div>
+    </div>
+
+  <!-- Panel de experiencia -->
+  <div id="panel-experiencia" class="hidden bg-gray-200 p-8 rounded-xl shadow-md w-full max-w-lg">
+    <h3 class="text-lg font-semibold text-gray-900 mb-6">Experiencia</h3>
+
+    <div class="flex gap-6 justify-center">
+      <button 
+        class="exp-btn px-6 py-2 bg-blue-400 text-black rounded-md font-semibold hover:bg-blue-500 hover:text-white"
+        data-exp="Óptima"
+      >Óptima</button>
+
+      <button 
+        class="exp-btn px-6 py-2 bg-blue-400 text-black rounded-md font-semibold hover:bg-blue-500 hover:text-white"
+        data-exp="Mejorada"
+      >Mejorada</button>
+
+      <button 
+        class="exp-btn px-6 py-2 bg-blue-400 text-black rounded-md font-semibold hover:bg-blue-500 hover:text-white"
+        data-exp="Premium"
+      >Premium</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- Script que solo se ejecuta en el cliente -->
+<script is:raw>
+  (function () {
+    const tipoBtns = Array.from(document.querySelectorAll(".tipo-btn"));
+    const expBtns = Array.from(document.querySelectorAll(".exp-btn"));
+    const panelExp = document.getElementById("panel-experiencia");
+
+    if (!panelExp) return;
+
+    let tipoSeleccionado = null;
+    let expSeleccionada = null;
+
+    // Seleccionar tipo de juego
+    tipoBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn instanceof HTMLElement && btn.dataset) {
+          tipoSeleccionado = btn.dataset.tipo;
+          // persist selection
+          try {
+            const all = JSON.parse(localStorage.getItem('configFormData') || '{}');
+            all.gaming = all.gaming || {};
+            all.gaming.tipo = tipoSeleccionado;
+            localStorage.setItem('configFormData', JSON.stringify(all));
+          } catch (e) {}
+        }
+
+        // Reset visual
+        tipoBtns.forEach(b => {
+          if (b instanceof HTMLElement) {
+            b.classList.remove("bg-blue-500", "text-white");
+            b.classList.add("bg-gray-300", "text-gray-900");
+          }
+        });
+
+        // Activado
+        if (btn instanceof HTMLElement) {
+          btn.classList.remove("bg-gray-300", "text-gray-900");
+          btn.classList.add("bg-blue-500", "text-white");
+        }
+
+        // Mostrar panel
+        panelExp.classList.remove("hidden");
+
+        // Reset experiencia
+        expSeleccionada = null;
+        expBtns.forEach(b => {
+          if (b instanceof HTMLElement) {
+            b.classList.remove("bg-blue-500", "text-white");
+            b.classList.add("bg-blue-400", "text-black");
+          }
+        });
+      });
+    });
+
+    // Seleccionar tipo de experiencia
+    expBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn instanceof HTMLElement && btn.dataset) {
+          expSeleccionada = btn.dataset.exp;
+          // persist selection
+          try {
+            const all = JSON.parse(localStorage.getItem('configFormData') || '{}');
+            all.gaming = all.gaming || {};
+            all.gaming.exp = expSeleccionada;
+            localStorage.setItem('configFormData', JSON.stringify(all));
+          } catch (e) {}
+        }
+
+        // Reset visual
+        expBtns.forEach(b => {
+          if (b instanceof HTMLElement) {
+            b.classList.remove("bg-blue-500", "text-white");
+            b.classList.add("bg-blue-400", "text-black");
+          }
+        });
+
+        // Activado
+        if (btn instanceof HTMLElement) {
+          btn.classList.remove("bg-blue-400", "text-black");
+          btn.classList.add("bg-blue-500", "text-white");
+        }
+      });
+    });
+
+    // Listen for external open event (Configurations asking to open gaming experience)
+    document.addEventListener('open-gaming-experience', () => {
+      panelExp.classList.remove('hidden');
+    });
+
+    // restore saved gaming selections on init
+    try {
+      const all = JSON.parse(localStorage.getItem('configFormData') || '{}');
+      const saved = all.gaming || {};
+      if (saved.tipo) {
+        tipoSeleccionado = saved.tipo;
+        // find button and activate
+        tipoBtns.forEach(b => {
+          if (b instanceof HTMLElement) {
+            if (b.dataset && b.dataset.tipo === tipoSeleccionado) {
+              b.classList.remove('bg-gray-300', 'text-gray-900');
+              b.classList.add('bg-blue-500', 'text-white');
+            } else {
+              b.classList.remove('bg-blue-500', 'text-white');
+              b.classList.add('bg-gray-300', 'text-gray-900');
+            }
+          }
+        });
+        panelExp.classList.remove('hidden');
+      }
+      if (saved.exp) {
+        expSeleccionada = saved.exp;
+        expBtns.forEach(b => {
+          if (b instanceof HTMLElement) {
+            if (b.dataset && b.dataset.exp === expSeleccionada) {
+              b.classList.remove('bg-blue-400', 'text-black');
+              b.classList.add('bg-blue-500', 'text-white');
+            } else {
+              b.classList.remove('bg-blue-500', 'text-white');
+              b.classList.add('bg-blue-400', 'text-black');
+            }
+          }
+        });
+      }
+    } catch (e) {}
+  })();
+</script>

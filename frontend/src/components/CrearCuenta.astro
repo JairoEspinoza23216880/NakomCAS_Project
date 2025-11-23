@@ -1,0 +1,189 @@
+---
+const radioBase = "px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200";
+const radioIdle = "bg-gray-100 text-gray-700 hover:bg-gray-200";
+const radioSelected = "bg-orange-500 text-white";
+---
+
+<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Registrarse</h2>
+    
+    <div id="message-container"></div>
+
+    <form id="register-form" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-600">
+                    Nombre
+                </label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Nombre"
+                    class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                    required
+                />
+            </div>
+            <div>
+                <label for="lastname" class="block mb-2 text-sm font-medium text-gray-600">
+                    Apellido
+                </label>
+                <input
+                    type="text"
+                    id="lastname"
+                    name="lastname"
+                    placeholder="Apellido"
+                    class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                    required
+                />
+            </div>
+        </div>
+
+        <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-600">
+                Correo Electrónico
+            </label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="correo@ejemplo.com"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+
+        <div>
+            <label for="phone_number" class="block mb-2 text-sm font-medium text-gray-600">
+                Teléfono
+            </label>
+            <input
+                type="tel"
+                id="phone_number"
+                name="phone_number"
+                placeholder="(999) 123-4567"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+
+        <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-600">
+                Contraseña
+            </label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Crea una contraseña segura"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+
+        <div>
+            <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-600">
+                Confirmar Contraseña
+            </label>
+            <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirma tu contraseña"
+                class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                required
+            />
+        </div>
+
+        <button
+            type="submit"
+            id="submit-btn"
+            class="w-full bg-orange-500 text-white px-4 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-200"
+        >
+            Crear Cuenta
+        </button>
+    </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('register-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const messageContainer = document.getElementById('message-container');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault(); // Prevenir el submit tradicional
+      
+      // Deshabilitar botón y mostrar estado de carga
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registrando...';
+      
+      // Limpiar mensajes anteriores
+      messageContainer.innerHTML = '';
+
+      try {
+        // Obtener datos del formulario
+        const formData = new FormData(form);
+        const data = {
+          name: formData.get('name'),
+          lastname: formData.get('lastname'),
+          email: formData.get('email'),
+          phone_number: formData.get('phone_number'),
+          password: formData.get('password')
+        };
+
+        // Validar que las contraseñas coincidan
+        if (formData.get('password') !== formData.get('confirmPassword')) {
+          throw new Error('Las contraseñas no coinciden');
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email)) {
+          throw new Error('Por favor, ingresa un correo electrónico válido');
+        }
+
+        // Hacer la petición al backend
+        const response = await fetch('http://localhost:8000/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // Mostrar mensaje de éxito
+          messageContainer.innerHTML = `
+            <div class="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
+              ${result.message || '¡Registro completado!'}
+            </div>
+          `;
+
+          // Limpiar formulario
+          form.reset();
+
+          // Redirigir después de 2 segundos
+          setTimeout(() => {
+            window.location.href = '/Login'; // Ajusta la ruta según tu estructura
+          }, 2000);
+        } else {
+          throw new Error(result.message || 'Error en el registro');
+        }
+      } catch (error) {
+        // Mostrar mensaje de error
+        messageContainer.innerHTML = `
+          <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+            ${error.message || 'Error en el registro'}
+          </div>
+        `;
+      } finally {
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Crear Cuenta';
+      }
+    });
+  });
+</script>

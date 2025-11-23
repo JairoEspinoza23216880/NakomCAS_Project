@@ -1,0 +1,272 @@
+---
+
+// --- Datos Simulados (Simulan la carga inicial del Backend - RF_ACP002) ---
+const TIPOS_COMPONENTES = ["CPU", "GPU", "RAM", "Motherboard", "Storage", "PSU", "Case"];
+
+const mockComponents = [
+    { id: '1', nombre: 'Ryzen 5 5600X', tipo: 'CPU', gama: 4, precio: 150.00, stock: 50, estado: 'Activo' },
+    { id: '2', nombre: 'RTX 3060', tipo: 'GPU', gama: 4, precio: 300.00, stock: 25, estado: 'Activo' },
+    { id: '3', nombre: 'DDR4 16GB 3200MHz', tipo: 'RAM', gama: 3, precio: 55.00, stock: 100, estado: 'Inactivo' },
+];
+
+// Pasar datos al cliente en formato seguro para la inicialización
+// Usaremos el mismo patrón que en tu código de ejemplo
+const componentsJSON = JSON.stringify(mockComponents);
+---
+
+<div class="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <h1 class="text-center text-3xl font-bold text-gray-800 mb-2">Administración de Componentes</h1>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- <p class="text-sm text-red-600 font-semibold mb-8">
+            (**RF_ACP001:** Asume que el usuario tiene el rol "Vendedor".)
+        </p> -->
+
+        <div class="bg-white p-6 shadow-xl rounded-lg border border-gray-100 mb-8">
+            <h2 id="form-title" class="text-2xl font-semibold text-gray-700 mb-4">Crear Nuevo Componente</h2>
+            
+            <div id="form-error" class="p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg hidden"></div>
+
+            <form id="component-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required 
+                        class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2" />
+                </div>
+                
+                <div>
+                    <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo</label>
+                    <select id="tipo" name="tipo" required 
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                        <option value="" disabled selected>Seleccione un Tipo</option>
+                        {TIPOS_COMPONENTES.map(type => (
+                            <option value={type}>{type}</option>
+                        ))}
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="gama" class="block text-sm font-medium text-gray-700">Gama (1-5)</label>
+                    <input type="number" id="gama" name="gama" required min="1" max="5" step="1" value="1"
+                        class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2" />
+                </div>
+                
+                <div>
+                    <label for="precio" class="block text-sm font-medium text-gray-700">Precio ($)</label>
+                    <input type="number" id="precio" name="precio" required min="0.01" step="0.01" value="0.01"
+                        class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2" />
+                </div>
+                
+                <div>
+                    <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                    <input type="number" id="stock" name="stock" required min="0" step="1" value="0"
+                        class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2" />
+                </div>
+
+                <div class="lg:col-span-5 flex justify-end space-x-4 pt-4">
+                    <button
+                        type="button"
+                        id="cancel-button"
+                        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none hidden"
+                    >
+                        Cancelar Edición
+                    </button>
+                    <button
+                        type="submit"
+                        id="submit-button"
+                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Crear Componente
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white p-6 shadow-xl rounded-lg overflow-x-auto">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Listado de Componentes</h2>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gama</th>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                        <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="component-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module" define:vars={{ componentsJSON }}>
+    // Parsear los datos iniciales que vienen del lado del servidor de Astro
+    let components = JSON.parse(componentsJSON || '[]');
+    let isEditingId = null;
+    const form = document.getElementById('component-form');
+    const tableBody = document.getElementById('component-table-body');
+    const errorDisplay = document.getElementById('form-error');
+    const formTitle = document.getElementById('form-title');
+    const submitButton = document.getElementById('submit-button');
+    const cancelButton = document.getElementById('cancel-button');
+
+    if (!form || !tableBody || !errorDisplay || !formTitle || !submitButton || !cancelButton) {
+        throw new Error("Elementos del DOM requeridos no encontrados.");
+    }
+
+    // --- Funciones de Lógica de Negocio ---
+
+    function validateForm(data) {
+        if (!data.nombre || !data.tipo) return "El Nombre y Tipo son requeridos.";
+        if ((data.gama || 0) < 1 || (data.gama || 0) > 5) return "La Gama debe ser entre 1 y 5.";
+        if ((data.precio || 0) <= 0) return "El Precio debe ser mayor a 0.";
+        if ((data.stock || 0) < 0) return "El Stock no puede ser negativo.";
+        // RF_ACP009 - No se realiza validación de compatibilidad.
+        return null;
+    }
+
+    // Función principal de renderizado (similar a tu `renderizar()` de ejemplo)
+    function renderizar() {
+        // --- Renderizar Tabla ---
+        tableBody.innerHTML = '';
+        components.forEach(component => {
+            const row = tableBody.insertRow();
+            row.className = component.estado === 'Inactivo' ? 'bg-red-50 opacity-75' : '';
+
+            // Columnas (Nombre, Tipo, Gama, Precio, Stock, Estado)
+            row.insertCell().textContent = component.nombre;
+            row.insertCell().textContent = component.tipo;
+            row.insertCell().textContent = component.gama.toString();
+            row.insertCell().textContent = `$${component.precio.toFixed(2)}`;
+            row.insertCell().textContent = component.stock.toString();
+
+            const statusCell = row.insertCell();
+            statusCell.innerHTML = `
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${component.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${component.estado}
+                </span>
+            `;
+
+            // Columna de Acciones
+            const actionsCell = row.insertCell();
+            actionsCell.className = 'px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2';
+            actionsCell.innerHTML = `
+                <button class="text-indigo-600 hover:text-indigo-900 edit-btn" data-id="${component.id}" ${isEditingId ? 'disabled' : ''}>
+                    Editar
+                </button>
+                <button class="${component.estado === 'Activo' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'} toggle-status-btn" data-id="${component.id}" ${isEditingId ? 'disabled' : ''}>
+                    ${component.estado === 'Activo' ? 'Desactivar' : 'Reactivar'}
+                </button>
+            `;
+        });
+
+        // --- Agregar Event Listeners a los botones de la tabla ---
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', () => startEdit(button.getAttribute('data-id')));
+        });
+
+        document.querySelectorAll('.toggle-status-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleStatus(button.getAttribute('data-id'));
+            });
+        });
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        errorDisplay.textContent = '';
+        errorDisplay.classList.add('hidden');
+
+        const nombreEl = form.elements.namedItem('nombre');
+        const tipoEl = form.elements.namedItem('tipo');
+        const gamaEl = form.elements.namedItem('gama');
+        const precioEl = form.elements.namedItem('precio');
+        const stockEl = form.elements.namedItem('stock');
+
+        const formData = {
+            nombre: nombreEl && nombreEl.value ? nombreEl.value : '',
+            tipo: tipoEl && tipoEl.value ? tipoEl.value : '',
+            gama: parseInt(gamaEl && gamaEl.value ? gamaEl.value : '0') || 0,
+            precio: parseFloat(precioEl && precioEl.value ? precioEl.value : '0') || 0,
+            stock: parseInt(stockEl && stockEl.value ? stockEl.value : '0') || 0,
+        };
+
+        const validationError = validateForm(formData);
+
+        if (validationError) {
+            errorDisplay.textContent = validationError;
+            errorDisplay.classList.remove('hidden');
+            return;
+        }
+
+        if (isEditingId) {
+            // Lógica de Edición (RF_ACP006)
+            components = components.map(c => c.id === isEditingId ? Object.assign({}, c, formData) : c);
+            cancelEdit(); // Limpiar y cambiar modo
+        } else {
+            // Lógica de Creación (RF_ACP005)
+            const newComponent = Object.assign({ id: Date.now().toString(), estado: 'Activo' }, formData);
+            components.push(newComponent);
+            form.reset();
+        }
+
+        renderizar(); // Actualizar la tabla
+    }
+
+    function startEdit(id) {
+        const component = components.find(c => c.id === id);
+        if (!component) return;
+
+        isEditingId = id;
+        
+        // Llenar el formulario con los datos del componente
+        const nombreEl = form.elements.namedItem('nombre');
+        const tipoEl = form.elements.namedItem('tipo');
+        const gamaEl = form.elements.namedItem('gama');
+        const precioEl = form.elements.namedItem('precio');
+        const stockEl = form.elements.namedItem('stock');
+
+        if (nombreEl && nombreEl instanceof HTMLInputElement) nombreEl.value = component.nombre;
+        if (tipoEl && tipoEl instanceof HTMLSelectElement) tipoEl.value = component.tipo;
+        if (gamaEl && gamaEl instanceof HTMLInputElement) gamaEl.value = component.gama.toString();
+        if (precioEl && precioEl instanceof HTMLInputElement) precioEl.value = component.precio.toString();
+        if (stockEl && stockEl instanceof HTMLInputElement) stockEl.value = component.stock.toString();
+
+        if (formTitle) formTitle.textContent = `Editar Componente: ${component.nombre}`;
+        if (submitButton) submitButton.textContent = 'Guardar Cambios';
+        if (cancelButton) cancelButton.classList.remove('hidden');
+        renderizar(); // Desactivar botones de edición de la tabla
+    }
+
+    function cancelEdit() {
+        isEditingId = null;
+        form.reset();
+
+        if (formTitle) formTitle.textContent = 'Crear Nuevo Componente';
+        if (submitButton) submitButton.textContent = 'Crear Componente';
+        if (cancelButton) cancelButton.classList.add('hidden');
+        renderizar(); // Reactivar botones de edición de la tabla
+    }
+
+    function toggleStatus(id) {
+        // Lógica de Desactivación/Reactivación (RF_ACP007 y RF_ACP008)
+        components = components.map(c => c.id === id ? Object.assign({}, c, { estado: c.estado === 'Activo' ? 'Inactivo' : 'Activo' }) : c);
+        renderizar();
+    }
+
+    // --- Inicialización y Event Listeners ---
+    
+    // Asignar el listener de envío al formulario
+    form.addEventListener('submit', handleFormSubmit);
+    
+    // Asignar el listener de cancelación
+    cancelButton.addEventListener('click', cancelEdit);
+
+    // Renderizado inicial
+    renderizar();
+</script>

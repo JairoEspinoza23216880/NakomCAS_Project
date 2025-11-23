@@ -1,0 +1,336 @@
+---
+// Configurador.astro
+// Componente Astro + Tailwind + JS
+// Props:
+// - pcs (opcional): arreglo de PCs preconfiguradas con estructura:
+//   { id, nombre, precio, activa, stock, gama_cpu, gama_gpu, gama_ram, componentes: {cpu,gpu,ram,otros} }
+// - user (opcional): objeto usuario; si null => visitante
+export interface PC {
+  id: string;
+  nombre: string;
+  precio: number;
+  activa: boolean;
+  stock: number;
+  gama_cpu: number; // 1..5 (ejemplo)
+  gama_gpu: number; // 1..5
+  gama_ram: number; // GB o índice 1..5
+  componentes: Record<string, string>;
+}
+
+export let pcs: PC[] = [];
+export let user = null;
+
+// Muestra datos de ejemplo si no vienen del backend
+if (pcs.length === 0) {
+  pcs = [
+    { id: 'pc-001', nombre: 'Gamma Gamer AAA', precio: 22000, activa: true, stock: 3, gama_cpu: 5, gama_gpu: 5, gama_ram: 4, componentes: { CPU: 'Ryzen 9', GPU: 'RTX 4080', RAM: '32GB' } },
+    { id: 'pc-002', nombre: 'Indie Player', precio: 12000, activa: true, stock: 5, gama_cpu: 3, gama_gpu: 3, gama_ram: 3, componentes: { CPU: 'Ryzen 5', GPU: 'RTX 3050', RAM: '16GB' } },
+    { id: 'pc-003', nombre: 'Workstation Arquitectura', precio: 28000, activa: true, stock: 1, gama_cpu: 5, gama_gpu: 4, gama_ram: 5, componentes: { CPU: 'Xeon', GPU: 'Quadro RTX', RAM: '64GB' } },
+    { id: 'pc-004', nombre: 'Budget Office', precio: 7000, activa: false, stock: 10, gama_cpu: 2, gama_gpu: 1, gama_ram: 2, componentes: { CPU: 'i3', GPU: 'Onboard', RAM: '8GB' } }
+  ];
+}
+
+// Mapa interno (RF_CPC005) — traducir "Necesidad" a requisitos mínimos
+const necesidadMapa = {
+  'Gaming-AAA': { gama_cpu: 5, gama_gpu: 5, gama_ram: 4 },
+  'Gaming-INDIE': { gama_cpu: 3, gama_gpu: 3, gama_ram: 3 },
+  'Workstation-Arquitectura': { gama_cpu: 5, gama_gpu: 4, gama_ram: 5 },
+  'Workstation-Render': { gama_cpu: 5, gama_gpu: 5, gama_ram: 5 },
+  'Oficina-Básica': { gama_cpu: 2, gama_gpu: 1, gama_ram: 2 },
+  'Streaming/Content': { gama_cpu: 4, gama_gpu: 4, gama_ram: 4 }
+};
+
+const necesidadesDisponibles = Object.keys(necesidadMapa);
+
+---
+
+<div class="p-6 bg-white rounded-2xl shadow-md max-w-4xl mx-auto mt-5 mb-5">
+  <h2 class="text-2xl font-semibold mb-4">Configurador de PC</h2>
+
+  <!-- Interfaz de Entradas: Necesidad y Presupuesto -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-gray-700">Necesidad</label>
+      <select id="necesidad" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-400 p-2">
+        <option value="">-- Selecciona una necesidad --</option>
+        {necesidadesDisponibles.map(n => (
+          <option value={n}>{n.replace('-', ' — ')}</option>
+        ))}
+      </select>
+      <p class="text-xs text-gray-500 mt-1">El sistema traducirá la necesidad a requisitos mínimos automáticamente.</p>
+    </div>
+
+    <div class="">
+      <label class="block text-sm font-medium text-gray-700">Presupuesto máximo (MXN)</label>
+      <div class="flex items-center gap-2 mt-1">
+        <input id="presupuesto-num" type="number" min="0" placeholder="Ej. 15000" class="w-32 rounded-md border-gray-300 p-2" />
+        <input id="presupuesto-range" type="range" min="0" max="100000" step="500" class="w-full" />
+      </div>
+      <p class="text-xs text-gray-500 mt-1">Opcional. Deja vacío para no aplicar límite.</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <button id="buscarBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Encontrar mi PC</button>
+    <button id="resetBtn" class="bg-gray-200 px-3 py-2 rounded-md">Limpiar</button>
+    <span id="status" class="text-sm text-gray-600 ml-2"></span>
+  </div>
+
+  <hr class="my-6" />
+
+  <!-- Resultados -->
+  <div id="resultados" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+  <!-- Mensaje de cero resultados -->
+  <div id="cero" class="hidden p-4 bg-yellow-50 border border-yellow-200 rounded-md mt-4">No se encontraron PCs con esos criterios. Prueba subiendo tu presupuesto o cambiando la necesidad.</div>
+
+</div>
+
+<!-- Modal de detalles -->
+<div id="detalleModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="modal-backdrop absolute inset-0"></div>
+  <div class="bg-white rounded-lg p-6 shadow-xl relative z-10 w-full max-w-2xl">
+    <button id="closeDetalle" class="absolute top-3 right-3 text-gray-500">✕</button>
+    <h3 id="detalleTitulo" class="text-xl font-semibold mb-2">Detalle PC</h3>
+    <div id="detalleBody" class="text-sm text-gray-700"></div>
+    <div class="mt-4 flex justify-end gap-2">
+      <button id="detalleOrder" class="bg-green-600 text-white px-4 py-2 rounded-md">Realizar Pedido</button>
+      <button id="detalleClose" class="bg-gray-200 px-4 py-2 rounded-md">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para cliente -->
+<div id="confirmModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="modal-backdrop absolute inset-0"></div>
+  <div class="bg-white rounded-lg p-6 shadow-xl relative z-10 w-full max-w-md">
+    <h3 class="text-lg font-semibold">Confirmar pedido</h3>
+    <p id="confirmText" class="mt-2 text-sm text-gray-700"></p>
+    <div class="mt-4 flex justify-end gap-2">
+      <button id="confirmYes" class="bg-indigo-600 text-white px-4 py-2 rounded-md">Confirmar</button>
+      <button id="confirmNo" class="bg-gray-200 px-4 py-2 rounded-md">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// Lógica cliente (traducción, filtrado y UI)
+const necesidadMap = JSON.parse(JSON.stringify({
+  'Gaming-AAA': { gama_cpu: 5, gama_gpu: 5, gama_ram: 4 },
+  'Gaming-INDIE': { gama_cpu: 3, gama_gpu: 3, gama_ram: 3 },
+  'Workstation-Arquitectura': { gama_cpu: 5, gama_gpu: 4, gama_ram: 5 },
+  'Workstation-Render': { gama_cpu: 5, gama_gpu: 5, gama_ram: 5 },
+  'Oficina-Básica': { gama_cpu: 2, gama_gpu: 1, gama_ram: 2 },
+  'Streaming/Content': { gama_cpu: 4, gama_gpu: 4, gama_ram: 4 }
+}));
+
+// Obtener DOM
+const necesidadEl = document.getElementById('necesidad');
+const presupuestoNum = document.getElementById('presupuesto-num');
+const presupuestoRange = document.getElementById('presupuesto-range');
+const buscarBtn = document.getElementById('buscarBtn');
+const resetBtn = document.getElementById('resetBtn');
+const statusEl = document.getElementById('status');
+const resultadosEl = document.getElementById('resultados');
+const ceroEl = document.getElementById('cero');
+
+// Modales
+const detalleModal = document.getElementById('detalleModal');
+const detalleTitulo = document.getElementById('detalleTitulo');
+const detalleBody = document.getElementById('detalleBody');
+const closeDetalle = document.getElementById('closeDetalle');
+const detalleClose = document.getElementById('detalleClose');
+const detalleOrder = document.getElementById('detalleOrder');
+
+const confirmModal = document.getElementById('confirmModal');
+const confirmText = document.getElementById('confirmText');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
+
+// Data: pasar desde Astro a window.__PCS__ o usar fetch
+let PCS = [];
+try {
+  // Astro inyecta la prop `pcs` como JSON en el HTML — si se usó, estará en window.__ASTRO_PROPS__
+  // Para evitar suposiciones, intentamos leer un objeto global creado por quien integra el componente.
+  PCS = window.__CONFIGURADOR_PCS__ || [];
+} catch (e) {
+  PCS = [];
+}
+
+// Si no hay PCs inyectadas, el HTML del componente ya renderizó ejemplos (servidor), así que nos guardamos también en un dataset
+if (!PCS || PCS.length === 0) {
+  // intentar extraer desde un atributo data-pcs en el nodo del componente (si el integrador lo agregó)
+  const root = document.currentScript?.closest('div') || document.querySelector('div');
+  if (root && root.dataset && root.dataset.pcs) {
+    try { PCS = JSON.parse(root.dataset.pcs); } catch(e){}
+  }
+}
+
+// Si aún vacio, hacemos una copia simple desde el HTML (esto permite ver los ejemplos server-side)
+if (!PCS || PCS.length === 0) {
+  // construir desde tarjetas presentes (no ideal, pero evita fallo)
+  PCS = [
+    { id: 'pc-001', nombre: 'Gamma Gamer AAA', precio: 22000, activa: true, stock: 3, gama_cpu: 5, gama_gpu: 5, gama_ram: 4, componentes: { CPU: 'Ryzen 9', GPU: 'RTX 4080', RAM: '32GB' } },
+    { id: 'pc-002', nombre: 'Indie Player', precio: 12000, activa: true, stock: 5, gama_cpu: 3, gama_gpu: 3, gama_ram: 3, componentes: { CPU: 'Ryzen 5', GPU: 'RTX 3050', RAM: '16GB' } },
+    { id: 'pc-003', nombre: 'Workstation Arquitectura', precio: 28000, activa: true, stock: 1, gama_cpu: 5, gama_gpu: 4, gama_ram: 5, componentes: { CPU: 'Xeon', GPU: 'Quadro RTX', RAM: '64GB' } },
+    { id: 'pc-004', nombre: 'Budget Office', precio: 7000, activa: false, stock: 10, gama_cpu: 2, gama_gpu: 1, gama_ram: 2, componentes: { CPU: 'i3', GPU: 'Onboard', RAM: '8GB' } }
+  ];
+}
+
+// sincronizar slider y numero
+presupuestoNum.addEventListener('input', e => {
+  const v = Number(e.target.value) || 0;
+  presupuestoRange.value = Math.min(Number(presupuestoRange.max), Math.max(Number(presupuestoRange.min), v));
+});
+presupuestoRange.addEventListener('input', e => {
+  presupuestoNum.value = e.target.value;
+});
+
+// evento buscar
+buscarBtn.addEventListener('click', () => {
+  const necesidad = necesidadEl.value;
+  const presupuesto = presupuestoNum.value ? Number(presupuestoNum.value) : null;
+
+  statusEl.textContent = '';
+
+  if (!necesidad) {
+    statusEl.textContent = 'Selecciona una necesidad para continuar.';
+    return;
+  }
+
+  // RF_CPC005 traducir necesidad
+  const req = necesidadMap[necesidad];
+  if (!req) {
+    statusEl.textContent = 'Necesidad no reconocida en el mapa interno.';
+    return;
+  }
+
+  // RF_CPC006 aplicar filtros (simulando la consulta backend)
+  const resultados = PCS.filter(pc => {
+    // 1. Activas
+    if (!pc.activa) return false;
+    // 2. Disponibles
+    if (!pc.stock || pc.stock <= 0) return false;
+    // 3..5 gamas >= requeridas
+    if (pc.gama_cpu < req.gama_cpu) return false;
+    if (pc.gama_gpu < req.gama_gpu) return false;
+    if (pc.gama_ram < req.gama_ram) return false;
+    // 6 precio <= presupuesto si se indicó
+    if (presupuesto !== null && pc.precio > presupuesto) return false;
+    return true;
+  });
+
+  renderResultados(resultados);
+});
+
+resetBtn.addEventListener('click', () => {
+  necesidadEl.value = '';
+  presupuestoNum.value = '';
+  presupuestoRange.value = 0;
+  resultadosEl.innerHTML = '';
+  ceroEl.classList.add('hidden');
+  statusEl.textContent = '';
+});
+
+function renderResultados(list) {
+  resultadosEl.innerHTML = '';
+  if (!list || list.length === 0) {
+    ceroEl.classList.remove('hidden');
+    return;
+  }
+  ceroEl.classList.add('hidden');
+
+  list.forEach(pc => {
+    const card = document.createElement('div');
+    card.className = 'bg-white p-4 rounded-lg shadow border';
+    card.innerHTML = `
+      <div class="flex justify-between items-start">
+        <div>
+          <h4 class="text-lg font-semibold">${pc.nombre}</h4>
+          <p class="text-sm text-gray-500">Precio: $${pc.precio.toLocaleString()}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-gray-400">CPU: G${pc.gama_cpu} · GPU: G${pc.gama_gpu} · RAM: G${pc.gama_ram}</p>
+        </div>
+      </div>
+      <div class="mt-3 flex gap-2">
+        <button class="verDetalleBtn bg-gray-100 px-3 py-1 rounded text-sm">Ver Detalles</button>
+        <button class="orderBtn bg-indigo-600 text-white px-3 py-1 rounded text-sm">Realizar Pedido</button>
+      </div>
+    `;
+
+    // eventos
+    const verDetalleBtn = card.querySelector('.verDetalleBtn');
+    const orderBtn = card.querySelector('.orderBtn');
+
+    verDetalleBtn.addEventListener('click', () => openDetalle(pc));
+    orderBtn.addEventListener('click', () => handleOrder(pc));
+
+    resultadosEl.appendChild(card);
+  });
+}
+
+function openDetalle(pc) {
+  detalleTitulo.textContent = pc.nombre + ` — $${pc.precio.toLocaleString()}`;
+  detalleBody.innerHTML = `
+    <ul class="list-disc pl-5">
+      ${Object.entries(pc.componentes || {}).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('')}
+    </ul>
+    <p class="mt-2 text-xs text-gray-500">Stock: ${pc.stock}</p>
+  `;
+  detalleModal.classList.remove('hidden');
+
+  // handler para realizar pedido desde detalle
+  detalleOrder.onclick = () => {
+    detalleModal.classList.add('hidden');
+    handleOrder(pc);
+  };
+}
+
+closeDetalle.addEventListener('click', () => detalleModal.classList.add('hidden'));
+detalleClose.addEventListener('click', () => detalleModal.classList.add('hidden'));
+
+// Manejo de pedido (RF_CPC010 y RF_CPC011)
+function handleOrder(pc) {
+  // Se intenta detectar si hay usuario; integrador puede setear window.__CONFIGURADOR_USER__
+  const userGlobal = window.__CONFIGURADOR_USER__ || null;
+
+  if (!userGlobal) {
+    // Visitante: almacenar selección en sessionStorage y redirigir a /login (RF_CPC010)
+    try {
+      sessionStorage.setItem('pc_seleccionada', JSON.stringify({ id: pc.id, nombre: pc.nombre, precio: pc.precio }));
+    } catch (e) {}
+    // Mensaje corto antes de redirigir (integrador puede cambiar la ruta)
+    const loginUrl = '/login';
+    // redirigir
+    window.location.href = loginUrl;
+    return;
+  }
+
+  // Cliente logueado -> mostrar modal de confirmación (RF_CPC011)
+  confirmText.textContent = `¿Confirmas el pedido de ${pc.nombre} por $${pc.precio.toLocaleString()}?`;
+  confirmModal.classList.remove('hidden');
+
+  confirmYes.onclick = async () => {
+    confirmModal.classList.add('hidden');
+    // Llamada a backend para crear pedido (ejemplo): POST /api/pedidos { userId, pcId }
+    // Aquí solo simulamos creación y redirección a /mis-pedidos
+
+    try {
+      // Ejemplo real:
+      // const res = await fetch('/api/pedidos', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId: userGlobal.id, pcId: pc.id }) });
+      // const data = await res.json();
+
+      // Simulación local:
+      console.log('Pedido creado para', userGlobal, pc);
+      // redirigir al usuario
+      window.location.href = '/mis-pedidos';
+    } catch (e) {
+      alert('Error al crear el pedido. Intenta de nuevo.');
+    }
+  };
+
+  confirmNo.onclick = () => confirmModal.classList.add('hidden');
+}
+
+</script>

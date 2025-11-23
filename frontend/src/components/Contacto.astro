@@ -1,0 +1,263 @@
+---
+
+---
+
+<div class="bg-gray-50 py-10">
+  <div class="w-full max-w-2xl p-8 mx-auto bg-white rounded-lg shadow-xl">
+    <div class="flex items-center mb-6">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-8 h-8 text-orange-500"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+        ></path>
+      </svg>
+      <h2 class="ml-3 text-2xl font-semibold text-gray-800">
+        Formulario de Contacto
+      </h2>
+    </div>
+
+    <form
+      id="contactForm"
+      action="https://formspree.io/f/TU_ID_DE_FORMULARIO"
+      method="POST"
+      class="space-y-6"
+    >
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <label
+            for="name"
+            class="block mb-2 text-sm font-medium text-gray-600"
+          >
+            Nombre completo
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Nombre completo"
+            class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            for="email"
+            class="block mb-2 text-sm font-medium text-gray-600"
+          >
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="correo@ejemplo.com"
+            class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="phone" class="block mb-2 text-sm font-medium text-gray-600">
+          Teléfono
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="(999) 123-4567"
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+        />
+      </div>
+
+      <div>
+        <span class="block mb-2 text-sm font-medium text-gray-600">
+          Tipo de Consulta
+        </span>
+        <div class="flex flex-wrap gap-3 justify-center items-center">
+          <input
+            type="radio"
+            id="cotizacion"
+            name="queryType"
+            value="Cotizacion"
+            class="hidden"
+            checked
+          />
+          <label
+            for="cotizacion"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Cotización
+          </label>
+
+          <input
+            type="radio"
+            id="soporte"
+            name="queryType"
+            value="Soporte"
+            class="hidden"
+          />
+          <label
+            for="soporte"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Soporte
+          </label>
+
+          <input
+            type="radio"
+            id="info"
+            name="queryType"
+            value="Informacion General"
+            class="hidden"
+          />
+          <label
+            for="info"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Información General
+          </label>
+
+          <input
+            type="radio"
+            id="otro"
+            name="queryType"
+            value="Otro"
+            class="hidden"
+          />
+          <label
+            for="otro"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Otro
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="subject"
+          class="block mb-2 text-sm font-medium text-gray-600"
+        >
+          Asunto
+        </label>
+        <input
+          type="text"
+          id="subject"
+          name="subject"
+          placeholder="Título de Asunto"
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+          required
+        />
+      </div>
+
+      <div>
+        <label
+          for="message"
+          class="block mb-2 text-sm font-medium text-gray-600"
+        >
+          Mensaje
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          rows="5"
+          placeholder="Escribe tu mensaje aquí."
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+          required></textarea>
+      </div>
+
+      <div class="flex items-center">
+        <input
+          id="terms"
+          name="terms"
+          type="checkbox"
+          class="w-5 h-5 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500"
+          required
+        />
+        <label for="terms" class="ml-2 text-sm text-gray-600">
+          Acepto los términos y condiciones.
+        </label>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="w-full px-6 py-3 font-semibold text-white bg-gray-800 rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 transition-colors duration-300"
+        >
+          Enviar Mensaje
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!--Simulador, es un concepto. Nada más, saludos Dani. -->
+
+<script is:"client">
+  async function loadUserData() {
+    try {
+      const userData = await simulateDBFetch();
+
+      if (userData) {
+        document.getElementById("name").value = userData.name;
+        document.getElementById("email").value = userData.email;
+        document.getElementById("phone").value = userData.phone;
+      }
+    } catch (error) {
+      console.error("Error al cargar datos del usuario:", error);
+    }
+  }
+
+  function simulateDBFetch() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          name: "Luis Angel Nahuat Tah",
+          email: "correo@ejemplo.com.mx",
+          phone: "(999) 1234567",
+        });
+      }, 500);
+    });
+  }
+
+  function updateRadioStyles() {
+    const radioInputs = document.querySelectorAll('input[name="queryType"]');
+    const radioLabels = document.querySelectorAll(".radio-label");
+
+    radioLabels.forEach((label, index) => {
+      const input = radioInputs[index];
+
+      if (input.checked) {
+        label.classList.remove("bg-gray-100", "text-gray-700");
+        label.classList.add("bg-orange-500", "text-white");
+      } else {
+        label.classList.remove("bg-orange-500", "text-white");
+        label.classList.add("bg-gray-100", "text-gray-700");
+      }
+    });
+  }
+
+  document.querySelectorAll('input[name="queryType"]').forEach((radio) => {
+    radio.addEventListener("change", updateRadioStyles);
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    loadUserData();
+    updateRadioStyles();
+  });
+</script>
+<style>
+  .radio-label {
+    user-select: none;
+  }
+</style>
