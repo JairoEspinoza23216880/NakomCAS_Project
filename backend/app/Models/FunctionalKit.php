@@ -6,10 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class FunctionalKit extends Model
 {
+    // TABLA
     protected $table = 'functional_kits';
-    protected $fillable = ['name', 'base_price', 'cpu_tier', 'gpu_tier', 'ram_tier', 'status'];
-    public $timestamps = false; // Si la tabla no tiene created_at/updated_at
 
+
+    // ATRIBUTOS
+    // Asignables
+    protected $fillable = [
+        'name',
+        'base_price',
+        'cpu_tier',
+        'gpu_tier',
+        'ram_tier',
+        'status',
+    ];
+
+    // Desactivar timestamps
+    public $timestamps = false;
+
+
+    // RELACIONES
     // Relación Muchos a Muchos con Componentes (Tabla Pivote)
     public function components()
     {

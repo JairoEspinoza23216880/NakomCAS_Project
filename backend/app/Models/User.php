@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    // Nombre de la tabla en la base de datos
+    // TABLA
     protected $table = 'users';
 
-    // Campos asignables masivamente
+
+    // ATRIBUTOS
+    // Asignables
     protected $fillable = [
         'name',
         'lastname',
@@ -20,9 +22,13 @@ class User extends Model
         'status'
     ];
 
-    // Desactivar timestamps si no se usan
-    public $timestamps = false;
+    // Timestamps
+    const CREATED_AT = 'register_date';
+    public $timestamps = true;
 
+
+    // RELACIONES
+    // Un usuario puede tener muchos pedidos
     public function orders()
     {
         return $this->hasMany(Order::class);
