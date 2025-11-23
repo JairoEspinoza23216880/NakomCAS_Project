@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class OrderXComponent extends Pivot
 {
     // TABLA
-    protected $table = 'order_x_component';
+    protected $table = 'order_x_components';
 
     // ATRIBUTOS
     // Asignables

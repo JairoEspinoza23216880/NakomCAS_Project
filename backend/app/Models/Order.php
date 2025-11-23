@@ -10,7 +10,7 @@ class Order extends Model
     protected $table = 'orders';
 
 
-    // ATRIBUTOs
+    // ATRIBUTOS
     // Asignables
     protected $fillable = [
         'user_id',

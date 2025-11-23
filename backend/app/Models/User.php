@@ -24,6 +24,7 @@ class User extends Model
 
     // Timestamps
     const CREATED_AT = 'register_date';
+    const UPDATED_AT = null;
     public $timestamps = true;
 
 

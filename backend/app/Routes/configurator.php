@@ -1,7 +1,7 @@
 <?php
 // ------------------------------------------------------------ //
 // --------------- DANIEL EL GRANDE Y PODEROSO ---------------- //
-// --- Digital Advisor for Need-bases IT Equipment Location --- //
+// --- Digital Advisor for Need-based IT Equipment Location --- //
 // -------------- Motor de configuración de PCs --------------- //
 // ------------------------------------------------------------ //
 
@@ -32,6 +32,9 @@ return function (App $app) {
 
         // 2. Separar needs y boosters en Arrays
         foreach ($needs_boosters as $pair) {
+            if (!is_array($pair) || count($pair) != 2) {
+                continue; // Saltar si el formato no es correcto
+            }
             $need_id = $pair[0];
             $booster_id = $pair[1];
 
@@ -94,7 +97,6 @@ return function (App $app) {
                 $personalizations[] = [
                     'id' => $p->id,
                     'name' => $p->name,
-                    'price' => $p->price ?? 0,
                     'super_category_id' => $p->super_category_id,
                     'tier' => $p->tier
                 ];
@@ -114,10 +116,23 @@ return function (App $app) {
         }
 
 
-        // 9. Calcular precio total
-        $total_price = $kit->base_price + ($structural_kit ? $structural_kit->structural_price : 0);
+        // 9. Calcular precio de los kits por suma de componentes
+        $functional_kit_price = 0;
+        $functional_components = $kit ? $kit->components : collect();
+        foreach ($functional_components as $component) {
+            $functional_kit_price += ($component->price ?? 0) * ($component->pivot->quantity ?? 1);
+        }
+
+        $structural_kit_price = 0;
+        $structural_components = $structural_kit ? $structural_kit->components : collect();
+        foreach ($structural_components as $component) {
+            $structural_kit_price += ($component->price ?? 0) * ($component->pivot->quantity ?? 1);
+        }
+
+        // Sumar personalizaciones
+        $total_price = $functional_kit_price + $structural_kit_price;
         foreach ($personalizations as $p) {
-            $total_price += $p['price'];
+            $total_price += isset($p['price']) ? $p['price'] : 0;
         }
 
 
@@ -127,16 +142,28 @@ return function (App $app) {
             'total_price' => round($total_price, 2),
             'build' => [
                 'functional_kit' => [
-                    'id' => $kit->id,
-                    'name' => $kit->name,
-                    'base_price' => $kit->base_price,
-                    'components_list' => $kit->components->pluck('name')->toArray()
+                    'id' => $kit ? $kit->id : null,
+                    'name' => $kit ? $kit->name : null,
+                    'calculated_price' => round($functional_kit_price, 2),
+                    'components_list' => $functional_components->map(function ($c) {
+                        return [
+                            'name' => $c->name,
+                            'price' => $c->price,
+                            'quantity' => $c->pivot->quantity ?? 1
+                        ];
+                    })->toArray()
                 ],
                 'structural_kit' => $structural_kit ? [
                     'id' => $structural_kit->id,
                     'name' => $structural_kit->name,
-                    'structural_price' => $structural_kit->structural_price,
-                    'components_list' => $structural_kit->components->pluck('name')->toArray()
+                    'calculated_price' => round($structural_kit_price, 2),
+                    'components_list' => $structural_components->map(function ($c) {
+                        return [
+                            'name' => $c->name,
+                            'price' => $c->price,
+                            'quantity' => $c->pivot->quantity ?? 1
+                        ];
+                    })->toArray()
                 ] : null,
                 'personalization_components' => $personalizations
             ]
