@@ -29,8 +29,8 @@ $app->addBodyParsingMiddleware(); // Middleware para parsear JSON automáticamen
 $authRoutes = require __DIR__ . '/../app/Routes/auth.php';
 $authRoutes($app);
 
-//$configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
-//$configRoutes($app);
+$configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
+$configRoutes($app);
 
 //$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
 //$adminRoutes($app);
