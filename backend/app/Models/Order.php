@@ -18,7 +18,7 @@ class Order extends Model
     {
         return $this->belongsToMany(
             Component::class, 
-            'order_x_kits', // El PDF indica order_x_kits, aunque order_x_components es más preciso
+            'order_x_kits',
             'order_id', 
             'component_id'
         )->withPivot('quantity', 'price_at_purchase'); // Capturar la cantidad y el precio del momento
