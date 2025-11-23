@@ -15,10 +15,26 @@ use App\Models\DanielMapPersonalization;
 use App\Models\DanielMapNeed;
 use App\Models\DanielMapBooster;
 
-
+/**
+ * Motor de Búsqueda de Configuración Óptima de PC
+ * POST /api/configurator/search
+ * 
+ * Encuentra la configuración óptima de un kit de PC basado en
+ * las necesidades del usuario, boosters y personalizaciones.
+ * 
+ * Request body:
+ * - selected_needs_n_boosters: array de parejas [need_id, booster_id]
+ * - selected_personalization_ids: array de IDs de personalización
+ * 
+ * Returns: Optimal functional kit, structural kit, and total price
+ */
 return function (App $app) {
 
     $app->post('/api/configurator/search', function (Request $request, Response $response) {
+        // Definir constante para super_category_id de gabinete
+        if (!defined('SUPER_CATEGORY_GABINET')) {
+            define('SUPER_CATEGORY_GABINET', 3);
+        }
 
         // 1. Obtener datos del body
         $body = $request->getParsedBody();
@@ -30,21 +46,35 @@ return function (App $app) {
         $gpu_tiers = [];
         $ram_tiers = [];
 
-        // 2. Separar needs y boosters en Arrays
+        // Validar y filtrar IDs
+        $valid_need_ids = array_filter(array_map(function ($pair) {
+            return isset($pair[0]) && is_numeric($pair[0]) ? (int)$pair[0] : null;
+        }, $needs_boosters));
+        $valid_booster_ids = array_filter(array_map(function ($pair) {
+            return isset($pair[1]) && is_numeric($pair[1]) && $pair[1] > 0 ? (int)$pair[1] : null;
+        }, $needs_boosters));
+        $valid_personalization_ids = array_filter($personalization_ids, 'is_numeric');
+
+        // Obtener needs y boosters en lote
+        $needs = DanielMapNeed::whereIn('id', $valid_need_ids)->get()->keyBy('id');
+        $boosters = DanielMapBooster::whereIn('id', $valid_booster_ids)->get()->keyBy('id');
+
+        // Arrays para tiers
+        $cpu_tiers = [];
+        $gpu_tiers = [];
+        $ram_tiers = [];
+
         foreach ($needs_boosters as $pair) {
-            if (!is_array($pair) || count($pair) != 2) {
-                continue; // Saltar si el formato no es correcto
-            }
+            if (!is_array($pair) || count($pair) != 2) continue;
             $need_id = $pair[0];
             $booster_id = $pair[1];
+            if (!is_numeric($need_id) || !isset($needs[$need_id])) continue;
+            $need = $needs[$need_id];
+            $booster = (is_numeric($booster_id) && isset($boosters[$booster_id])) ? $boosters[$booster_id] : null;
 
-            $need = DanielMapNeed::find($need_id);
-            $booster = $booster_id ? DanielMapBooster::find($booster_id) : null;
-
-            // 3. Sumar boosters a cada need
-            $cpu = $need ? $need->cpu_tier : 0;
-            $gpu = $need ? $need->gpu_tier : 0;
-            $ram = $need ? $need->ram_tier : 0;
+            $cpu = $need->cpu_tier;
+            $gpu = $need->gpu_tier;
+            $ram = $need->ram_tier;
 
             if ($booster) {
                 $cpu += $booster->cpu_tier_plus;
@@ -74,12 +104,20 @@ return function (App $app) {
 
 
         // 6. Buscar kit estructural óptimo (menor precio, status Activo, y tier de gabinete si aplica)
+        // 6. Personalizaciones y gabinete (optimizado)
+        $personalizations = [];
         $cabinet_tier = null;
-        foreach ($personalization_ids as $pid) {
-            $p = DanielMapPersonalization::find($pid);
-            if ($p && $p->super_category_id == 3) {
+        $personalization_objs = DanielMapPersonalization::whereIn('id', $valid_personalization_ids)->get();
+        foreach ($personalization_objs as $p) {
+            $personalizations[] = [
+                'id' => $p->id,
+                'name' => $p->name,
+                'price' => isset($p->price) ? $p->price : 0,
+                'super_category_id' => $p->super_category_id,
+                'tier' => $p->tier
+            ];
+            if ($p->super_category_id == SUPER_CATEGORY_GABINET) {
                 $cabinet_tier = $p->tier;
-                break;
             }
         }
         $structural_query = StructuralKit::where('status', 'Activo');
@@ -108,7 +146,7 @@ return function (App $app) {
         if (!$kit) {
             $data = [
                 'success' => false,
-                'message' => 'No pudimos encontrar una combinación viable dentro del presupuesto y requisitos.'
+                'message' => 'No pudimos encontrar una combinación viable dentro de los requisitos.'
             ];
             $response = $response->withStatus(404);
             $response->getBody()->write(json_encode($data));
