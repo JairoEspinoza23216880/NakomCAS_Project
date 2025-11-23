@@ -4,6 +4,11 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\RequestInterface as Request;
 use Slim\Factory\AppFactory;
+use App\Models\User;
+
+// --------------------------------------------
+// --- CARGA DEPENDENCIAS Y CONFIGURACIONES ---
+// --------------------------------------------
 
 // Carga todas las dependencias de Composer
 require __DIR__ . '/../vendor/autoload.php';
@@ -14,20 +19,28 @@ require __DIR__ . '/../config/database.php';
 
 // Crea la aplicación Slim
 $app = AppFactory::create();
+$app->addBodyParsingMiddleware(); // Middleware para parsear JSON automáticamente
 
-// --- RUTAS DE TU API ---
+// ---------------------
+// --- RUTAS DEL API ---
+// ---------------------
+
 // Carga rutas desde archivos separados para mejor organización
 $authRoutes = require __DIR__ . '/../app/Routes/auth.php';
 $authRoutes($app);
 
-$configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
-$configRoutes($app);
+//$configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
+//$configRoutes($app);
 
-$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
-$adminRoutes($app);
+//$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
+//$adminRoutes($app);
 
-$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
-$ordersRoutes($app);
+//$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
+//$ordersRoutes($app);
+
+// -----------------------
+// --- RUTAS DE PRUEBA ---
+// -----------------------
 
 /**
  * Ruta de Prueba: GET /hello

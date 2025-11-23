@@ -25,6 +25,7 @@ class JwtMiddleware
         // 1. Obtener la cabecera Authorization
         $authHeader = $request->getHeaderLine('Authorization');
 
+
         // 2. Validar que tenga el formato "Bearer <token>"
         if (!$authHeader || !preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
             return $this->unauthorizedResponse('Token no proporcionado o formato inválido.');
@@ -38,11 +39,13 @@ class JwtMiddleware
         // Extraer el token
         $token = $matches[1];
 
+
         try {
             // 3. Decodificar el token
             // Usamos la clave secreta del .env (La que nadie podrá adivinar muajaja)
             $secretKey = $_ENV['JWT_SECRET'] ?? 'default_secret_key_DO_NOT_USE';
             $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+
 
             // 4. ¡Éxito! Inyectar los datos del usuario en la petición
             // Esto permite acceder a $request->getAttribute('user') en los controladores
