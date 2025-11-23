@@ -100,14 +100,66 @@ return function (App $app) {
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     });
 
+
+
     /**
      * REGISTRO DE USUARIO
      * Endpoint: POST /api/register
      * (Espacio reservado para PJDV)
      */
     $app->post('/api/register', function (Request $request, Response $response) {
-        // Espacio reservado para PJDV
+
+        // 1. Obtener los datos del JSON enviado por el Frontend
+        $data = $request->getParsedBody();
+        $name = $data['name'] ?? null;
+        $lastname = $data['lastname'] ?? null;
+        $email = $data['email'] ?? null;
+        $phoneNumber = $data['phone_number'] ?? null;
+        $password = $data['password'] ?? null;
+
+        // 2. Validación de campos obligatorios
+        if (!$name || !$lastname || !$email || !$phoneNumber || !$password) {
+            $payload = json_encode([
+                'success' => false,
+                'message' => 'Todos los campos son obligatorios.'
+            ]);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // 3. Verificar si el email ya existe
+        if (User::where('email', $email)->exists()) {
+            $payload = json_encode([
+                'success' => false,
+                'message' => 'El correo electrónico ya está registrado.'
+            ]);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        }
+
+        // 4. Crear usuario (rol cliente por defecto: 2)
+        $user = new User([
+            'name' => $name,
+            'lastname' => $lastname,
+            'email' => $email,
+            'phone_number' => $phoneNumber,
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'user_role_id' => 2
+        ]);
+        $user->save();
+
+        // 5. El proceso fue exitoso, devuelve respuesta
+        $payload = json_encode([
+            'success' => true,
+            'message' => 'Registro exitoso. Procede a iniciar sesión.'
+        ]);
+
+        // 6. Enviar respuesta
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     });
+
+
 
     /**
      * VERIFICAR SESIÓN
