@@ -168,8 +168,10 @@ return function (App $app) {
         $user = $request->getAttribute('user');
         $userId = $user->sub ?? $user->id;
 
+
         // 2. Consultar pedidos del usuario
         $orders = Order::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+
 
         // 3. Formatear respuesta según contrato
         $result = [];
@@ -202,16 +204,55 @@ return function (App $app) {
 
 
     /**
-     * DETALLES DE UN PEDIDO
+     * DETALLE DE PEDIDO
      * Endpoint: GET /api/orders/{id}
-     * Objetivo: Obtener los detalles de un pedido específico del usuario autenticado
-     * Nota: Implementación pendiente, solo esqueleto
+     * Objetivo: Obtener el detalle completo de un pedido del usuario autenticado
      */
     $app->get('/api/orders/{id}', function (Request $request, Response $response, $args) {
+        // 1. Obtener usuario autenticado
+        $user = $request->getAttribute('user');
+        $userId = $user->sub ?? $user->id;
         $orderId = $args['id'];
-        $response->getBody()->write(json_encode([
-            'message' => "Aquí irían los detalles del pedido #$orderId del usuario autenticado."
-        ]));
+
+        // 2. Buscar el pedido
+        $order = Order::find($orderId);
+        if (!$order) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Pedido no encontrado.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        // 3. Verificar que el pedido pertenezca al usuario
+        if ($order->user_id != $userId) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'No tienes permiso para ver este pedido.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+        }
+
+        // 4. Construir lista de componentes
+        $components = [];
+        foreach ($order->components as $component) {
+            $components[] = [
+                'name' => $component->name,
+                'price' => $component->price,
+                'quantity' => $component->pivot->quantity
+            ];
+        }
+
+        // 5. Formatear respuesta
+        $result = [
+            'id' => $order->id,
+            'status' => $order->status,
+            'date' => $order->created_at,
+            'total_price' => $order->total_price,
+            'components' => $components
+        ];
+
+        $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     })->add(new JwtMiddleware());
 };
