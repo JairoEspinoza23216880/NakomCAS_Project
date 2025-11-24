@@ -9,42 +9,54 @@ use App\Models\User;
 use App\Middleware\JwtMiddleware;
 use Illuminate\Database\Capsule\Manager as DB;
 
+// Función para autenticar usuario y obtener el rol
+if (!function_exists('authenticateAdmin')) {
+    function authenticateAdmin($request)
+    {
+        $jwtUser = $request->getAttribute('user');
+        if (!$jwtUser || !isset($jwtUser->sub)) {
+            return [
+                'success' => false,
+                'code' => 401,
+                'message' => 'No se pudo identificar al usuario.'
+            ];
+        }
+        $user = User::with('userRole')->find($jwtUser->sub);
+        if (!$user || !$user->userRole || stripos(strtolower($user->userRole->name), 'admin') === false) {
+            return [
+                'success' => false,
+                'code' => 403,
+                'message' => 'Acceso denegado: solo administradores pueden realizar esta acción.'
+            ];
+        }
+        return [
+            'success' => true,
+            'user' => $user
+        ];
+    }
+}
+
+// Rutas para administración de pedidos
 return function (App $app) {
     // Middleware: Solo usuarios con rol Vendedor
     $app->get('/api/admin/orders', function (Request $request, Response $response) {
         try {
-
-            // 1. Obtener usuario autenticado desde el token (JWT decodificado)
-            $jwtUser = $request->getAttribute('user');
-            if (!$jwtUser || !isset($jwtUser->sub)) {
+            $auth = authenticateAdmin($request);
+            if (!$auth['success']) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
-                    'message' => 'No se pudo identificar al usuario.'
+                    'message' => $auth['message']
                 ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
             }
+            $user = $auth['user'];
 
-            // 2. Buscar el usuario real en la base de datos para obtener el rol
-            $user = User::find($jwtUser->sub);
-            if (!$user || $user->user_role_id != 1) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => 'Acceso denegado: solo administradores pueden ver los pedidos.'
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
-            }
-
-            // 3. Consultar todos los pedidos con datos del cliente
             $orders = Order::with(['user'])
                 ->orderBy('id', 'desc')
                 ->get();
 
-            // 4. Formatear la respuesta para cada pedido
             $result = $orders->map(function ($order) {
-                // 4.1 Generar summary_name (ejemplo: "Kit Gaming Pro + Combo Airflow")
                 $summary_name = '';
-                // Si hay relación con kits, aquí se puede mejorar para mostrar el nombre del kit
-                // Por ahora, solo ejemplo con nombre del cliente
                 if ($order->user) {
                     $summary_name = $order->user->name . ' ' . $order->user->lastname;
                 }
@@ -60,11 +72,12 @@ return function (App $app) {
                 ];
             });
 
-            // 5. Devolver respuesta exitosa
-            $response->getBody()->write(json_encode($result));
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'orders' => $result
+            ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
-            // 6. Manejar excepciones y devolver mensaje de error
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error al obtener los pedidos: ' . $e->getMessage()
@@ -76,25 +89,15 @@ return function (App $app) {
 
     $app->get('/api/admin/orders/{id}', function (Request $request, Response $response, $args) {
         try {
-            // 1. Autenticación y verificación de rol
-            $jwtUser = $request->getAttribute('user');
-            if (!$jwtUser || !isset($jwtUser->sub)) {
+            $auth = authenticateAdmin($request);
+            if (!$auth['success']) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
-                    'message' => 'No se pudo identificar al usuario.'
+                    'message' => $auth['message']
                 ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
-            }
-            $user = User::find($jwtUser->sub);
-            if (!$user || $user->user_role_id != 1) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => 'Acceso denegado: solo administradores pueden ver los pedidos.'
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
             }
 
-            // 2. Validar que el ID sea numérico
             $orderId = $args['id'];
             if (!is_numeric($orderId)) {
                 $response->getBody()->write(json_encode([
@@ -104,7 +107,6 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // 3. Obtener el pedido por ID
             $order = Order::with(['user', 'components.componentType'])->find($orderId);
             if (!$order) {
                 $response->getBody()->write(json_encode([
@@ -114,7 +116,6 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
-            // 4. Formatear la respuesta con datos del cliente y componentes
             $result = [
                 'id' => $order->id,
                 'status' => $order->status,
@@ -138,7 +139,10 @@ return function (App $app) {
                 })
             ];
 
-            $response->getBody()->write(json_encode($result));
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'order' => $result
+            ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
             $response->getBody()->write(json_encode([
@@ -151,25 +155,15 @@ return function (App $app) {
 
     $app->patch('/api/admin/orders/{id}/status', function (Request $request, Response $response, $args) {
         try {
-            // 1. Autenticación y verificación de rol
-            $jwtUser = $request->getAttribute('user');
-            if (!$jwtUser || !isset($jwtUser->sub)) {
+            $auth = authenticateAdmin($request);
+            if (!$auth['success']) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
-                    'message' => 'No se pudo identificar al usuario.'
+                    'message' => $auth['message']
                 ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
-            }
-            $user = User::find($jwtUser->sub);
-            if (!$user || $user->user_role_id != 1) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => 'Acceso denegado: solo administradores pueden modificar pedidos.'
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
             }
 
-            // 2. Validar que el ID sea numérico
             $orderId = $args['id'];
             if (!is_numeric($orderId)) {
                 $response->getBody()->write(json_encode([
@@ -179,7 +173,6 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // 3. Obtener el pedido
             $order = Order::find($orderId);
             if (!$order) {
                 $response->getBody()->write(json_encode([
@@ -189,7 +182,6 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
-            // 4. Validar el estado recibido
             $body = $request->getParsedBody();
             $newStatus = $body['status'] ?? null;
             $allowedStatuses = [
@@ -210,13 +202,14 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // 5. Actualizar el estado y guardar
             $order->status = $newStatus;
             $order->save();
 
             $response->getBody()->write(json_encode([
                 'success' => true,
-                'message' => "El pedido #{$order->id} ahora está: {$newStatus}"
+                'order_id' => $order->id,
+                'new_status' => $newStatus,
+                'message' => "El pedido ha sido actualizado correctamente."
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
