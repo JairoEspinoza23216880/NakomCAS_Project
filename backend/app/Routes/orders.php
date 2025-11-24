@@ -16,6 +16,12 @@ use App\Middleware\JwtMiddleware;
 use Illuminate\Database\Capsule\Manager as DB;
 
 return function (App $app) {
+
+    /**
+     * CREACIÓN DE PEDIDO
+     * Endpoint: POST /api/orders
+     * Objetivo: Crear un nuevo pedido con kits y personalización
+     */
     $app->post('/api/orders', function (Request $request, Response $response) {
 
         // 1. Obtener datos del cuerpo y usuario autenticado
@@ -148,5 +154,64 @@ return function (App $app) {
             'order_id' => $order->id
         ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+    })->add(new JwtMiddleware());
+
+
+
+    /**
+     * LISTAR MIS PEDIDOS
+     * Endpoint: GET /api/orders
+     * Objetivo: Obtener la lista histórica de pedidos del usuario autenticado
+     */
+    $app->get('/api/orders', function (Request $request, Response $response) {
+        // 1. Obtener usuario autenticado desde el token
+        $user = $request->getAttribute('user');
+        $userId = $user->sub ?? $user->id;
+
+        // 2. Consultar pedidos del usuario
+        $orders = Order::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+
+        // 3. Formatear respuesta según contrato
+        $result = [];
+        foreach ($orders as $order) {
+            // Generar nombre resumen (puedes ajustar la lógica según tu modelo)
+            $summary = '';
+            $kits = [];
+            // Buscar componentes que sean parte de kits funcionales y estructurales
+            foreach ($order->components as $component) {
+                $kits[] = $component->name;
+            }
+            if (count($kits) > 0) {
+                $summary = implode(' + ', $kits);
+            } else {
+                $summary = 'Pedido sin kits';
+            }
+            $result[] = [
+                'id' => $order->id,
+                'date' => $order->created_at,
+                'status' => $order->status,
+                'total_price' => $order->total_price,
+                'summary_name' => $summary
+            ];
+        }
+
+        $response->getBody()->write(json_encode($result));
+        return $response->withHeader('Content-Type', 'application/json');
+    })->add(new JwtMiddleware());
+
+
+
+    /**
+     * DETALLES DE UN PEDIDO
+     * Endpoint: GET /api/orders/{id}
+     * Objetivo: Obtener los detalles de un pedido específico del usuario autenticado
+     * Nota: Implementación pendiente, solo esqueleto
+     */
+    $app->get('/api/orders/{id}', function (Request $request, Response $response, $args) {
+        $orderId = $args['id'];
+        $response->getBody()->write(json_encode([
+            'message' => "Aquí irían los detalles del pedido #$orderId del usuario autenticado."
+        ]));
+        return $response->withHeader('Content-Type', 'application/json');
     })->add(new JwtMiddleware());
 };
