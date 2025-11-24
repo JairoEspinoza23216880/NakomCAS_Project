@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\Order;
 use App\Models\User;
 use App\Middleware\JwtMiddleware;
-use Illuminate\Database\Capsule\Manager as DB;
 
 // Función para autenticar usuario y obtener el rol
 if (!function_exists('authenticateAdmin')) {
