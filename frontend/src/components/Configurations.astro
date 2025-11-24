@@ -89,6 +89,8 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
                 <p class="mt-4 text-center cursor-pointer">Aún no has configurado tu PC.<br>Presiona para verlo aqui</p>
             </div>
         </div>
+
+        <!-- En este apartado se mostrará un resumen de la configuración seleccionada, incluyendo los componentes elegidos y la computadora de acuerdo a los requisitos -->
         <div class="mt-3 justify-center flex">
             <button id="btnEnviar" class="cursor-pointer px-4 py-2 m-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Ver detalles</button>
             <button id="btnEnviar" class="cursor-pointer px-4 py-2 m-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Realizar Pedido</button>
@@ -98,7 +100,7 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
 </div>
 
 <!-- SCRIPT FUNCIONAL -->
-<script is:raw>
+<script>
   // Ahora los formularios están renderizados server-side como paneles
   // con `data-form`. swapForm solo muestra/oculta los paneles.
 

@@ -63,10 +63,14 @@ let userData = null;
             <p class="font-semibold text-gray-800">${userData?.name || 'Usuario'}</p>
             <p class="text-sm text-gray-600">${userData?.email || ''}</p>
           </div>
-          <button id="logout-btn" class="w-full text-left block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl text-red-600">
+          <a href="/AdministratorUsers" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Usuario</a>
+          <a href="/OrderAdministrator" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Pedidos</a>
+          <a href="/AdminComponents" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-componentes</a>
+          <a href="/AdminConfiguradorPC" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-PreConfig</a>
+
+          <button id="logout-btn" class="cursor-pointer w-full text-left block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl text-red-600">
             Cerrar sesión
           </button>
-          <a href="/UserProfile" class="block px-4 py-2 hover:bg-gray-100">Mi Perfil</a>
         `;
       } else {
         // Usuario no logueado
