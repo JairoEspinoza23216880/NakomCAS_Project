@@ -35,8 +35,8 @@ $configRoutes($app);
 //$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
 //$adminRoutes($app);
 
-//$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
-//$ordersRoutes($app);
+$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
+$ordersRoutes($app);
 
 // -----------------------
 // --- RUTAS DE PRUEBA ---
