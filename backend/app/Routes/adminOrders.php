@@ -72,4 +72,84 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     })->add(new JwtMiddleware());
+
+
+    $app->get('/api/admin/orders/{id}', function (Request $request, Response $response, $args) {
+        try {
+            // 1. Autenticación y verificación de rol
+            $jwtUser = $request->getAttribute('user');
+            if (!$jwtUser || !isset($jwtUser->sub)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'No se pudo identificar al usuario.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+            }
+            $user = User::find($jwtUser->sub);
+            if (!$user || $user->user_role_id != 1) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Acceso denegado: solo administradores pueden ver los pedidos.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+            }
+
+            // 2. Validar que el ID sea numérico
+            $orderId = $args['id'];
+            if (!is_numeric($orderId)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El ID del pedido debe ser numérico.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // 3. Obtener el pedido por ID
+            $order = Order::with(['user', 'components.componentType'])->find($orderId);
+            if (!$order) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Pedido no encontrado.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            // 4. Formatear la respuesta con datos del cliente y componentes
+            $result = [
+                'id' => $order->id,
+                'status' => $order->status,
+                'date' => $order->created_at,
+                'client_info' => [
+                    'name' => $order->user ? $order->user->name : null,
+                    'lastname' => $order->user ? $order->user->lastname : null,
+                    'email' => $order->user ? $order->user->email : null,
+                    'phone' => $order->user ? $order->user->phone_number : null
+                ],
+                'financials' => [
+                    'total_price' => $order->total_price
+                ],
+                'components' => $order->components->map(function ($comp) {
+                    return [
+                        'name' => $comp->name,
+                        'type_name' => $comp->componentType ? $comp->componentType->type_name : null,
+                        'quantity' => $comp->pivot->quantity,
+                        'price_at_purchase' => $comp->pivot->price_at_purchase
+                    ];
+                })
+            ];
+
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error al obtener el pedido: ' . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    })->add(new JwtMiddleware());
+
+    $app->patch('/api/admin/orders/{id}/status', function (Request $request, Response $response, $args) {
+        // Lógica para actualizar el estado de un pedido específico por ID
+    })->add(new JwtMiddleware());
 };
