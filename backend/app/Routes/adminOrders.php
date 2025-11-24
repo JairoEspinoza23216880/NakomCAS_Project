@@ -150,6 +150,81 @@ return function (App $app) {
     })->add(new JwtMiddleware());
 
     $app->patch('/api/admin/orders/{id}/status', function (Request $request, Response $response, $args) {
-        // Lógica para actualizar el estado de un pedido específico por ID
+        try {
+            // 1. Autenticación y verificación de rol
+            $jwtUser = $request->getAttribute('user');
+            if (!$jwtUser || !isset($jwtUser->sub)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'No se pudo identificar al usuario.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+            }
+            $user = User::find($jwtUser->sub);
+            if (!$user || $user->user_role_id != 1) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Acceso denegado: solo administradores pueden modificar pedidos.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+            }
+
+            // 2. Validar que el ID sea numérico
+            $orderId = $args['id'];
+            if (!is_numeric($orderId)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El ID del pedido debe ser numérico.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // 3. Obtener el pedido
+            $order = Order::find($orderId);
+            if (!$order) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Pedido no encontrado.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            // 4. Validar el estado recibido
+            $body = $request->getParsedBody();
+            $newStatus = $body['status'] ?? null;
+            $allowedStatuses = [
+                'Pedido Recibido',
+                'Esperando Pago',
+                'Preparando Componentes',
+                'En Ensamblaje',
+                'Configuración y Pruebas',
+                'Listo para Entrega',
+                'Completado',
+                'Cancelado'
+            ];
+            if (!$newStatus || !in_array($newStatus, $allowedStatuses)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Estado inválido. Debe ser uno de: ' . implode(', ', $allowedStatuses)
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // 5. Actualizar el estado y guardar
+            $order->status = $newStatus;
+            $order->save();
+
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => "El pedido #{$order->id} ahora está: {$newStatus}"
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error al actualizar el estado: ' . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
     })->add(new JwtMiddleware());
 };
