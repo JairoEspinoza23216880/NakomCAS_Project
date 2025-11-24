@@ -1,0 +1,137 @@
+---
+// Este componente se renderiza en el servidor con HTML base y se hidrata en el cliente
+let isAuthenticated = false;
+let userData = null;
+
+// Este código se ejecuta en el servidor (no puede acceder a localStorage)
+// Pero podemos preparar el HTML base
+---
+
+<div id="user-menu-wrapper" data-authenticated="false">
+  <!-- Botón base -->
+  <button id="user-menu-button" class="cursor-pointer items-center text-white rounded-xl">
+    <img src="../../public/img/user.png" alt="imagen usuario" class="w-9 h-9 rounded-full mx-auto">
+    <span id="user-name" class="text-sm text-gray-800 ml-2 hidden md:inline">Usuario</span>
+  </button>
+
+  <!-- Menú base (no logueado) -->
+  <div id="user-menu" class="hidden absolute right-0 mt-2 bg-white text-gray-700 rounded-xl shadow-lg border border-gray-200 z-10">
+    <a href="/Signup" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl">Registrarse</a>
+    <a href="/Login" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl">Iniciar sesión</a>
+  </div>
+</div>
+
+<script>
+  // Este script se ejecuta en el cliente
+  (function () {
+    function updateMenu() {
+      const token = localStorage.getItem('authToken');
+      console.log('Auth Token:', token); // Ahora sí se imprimirá
+      
+      const authenticated = !!token;
+      let userData = null;
+      
+      if (authenticated) {
+        const userString = localStorage.getItem('user');
+        if (userString) {
+          try {
+            userData = JSON.parse(userString);
+          } catch (e) {
+            console.error('Error parsing user data:', e);
+          }
+        }
+      }
+
+      const wrapper = document.getElementById('user-menu-wrapper');
+      const userName = document.getElementById('user-name');
+      const menu = document.getElementById('user-menu');
+      const button = document.getElementById('user-menu-button');
+
+      if (!wrapper || !userName || !menu || !button) return;
+
+      // Actualizar estado de autenticación
+      wrapper.setAttribute('data-authenticated', authenticated.toString());
+
+      if (authenticated) {
+        // Usuario logueado
+        userName.textContent = userData?.name || 'Usuario';
+        userName.classList.remove('hidden');
+        
+        // Actualizar menú para usuario logueado
+        menu.innerHTML = `
+          <div class="px-4 py-2 border-b border-gray-100">
+            <p class="font-semibold text-gray-800">${userData?.name || 'Usuario'}</p>
+            <p class="text-sm text-gray-600">${userData?.email || ''}</p>
+          </div>
+          <button id="logout-btn" class="w-full text-left block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl text-red-600">
+            Cerrar sesión
+          </button>
+          <a href="/UserProfile" class="block px-4 py-2 hover:bg-gray-100">Mi Perfil</a>
+        `;
+      } else {
+        // Usuario no logueado
+        userName.textContent = '';
+        userName.classList.add('hidden');
+        
+        // Restaurar menú para usuario no logueado
+        menu.innerHTML = `
+          <a href="/Signup" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl">Registrarse</a>
+          <a href="/Login" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl">Iniciar sesión</a>
+        `;
+      }
+
+      // Re-inicializar eventos
+      initializeEvents();
+    }
+
+    function initializeEvents() {
+      const btn = document.getElementById("user-menu-button");
+      const menu = document.getElementById("user-menu");
+      const wrapper = document.getElementById("user-menu-wrapper");
+      const logoutBtn = document.getElementById("logout-btn");
+
+      if (!btn || !menu || !wrapper) return;
+
+      // Limpiar eventos anteriores para evitar duplicados
+      btn.replaceWith(btn.cloneNode(true));
+      const newBtn = document.getElementById("user-menu-button");
+      newBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menu.classList.toggle("hidden");
+      });
+
+      // Manejar logout
+      if (logoutBtn) {
+        logoutBtn.replaceWith(logoutBtn.cloneNode(true));
+        const newLogoutBtn = document.getElementById("logout-btn");
+        newLogoutBtn.addEventListener("click", () => {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          updateMenu(); // Actualizar menú después del logout
+          location.href = '/Login';      });
+      }
+
+      // Cerrar menú al hacer clic fuera
+      document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target && !wrapper.contains(target)) {
+          menu.classList.add("hidden");
+        }
+      });
+    }
+
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateMenu);
+    } else {
+      updateMenu();
+    }
+
+    // También ejecutar cuando cambie el estado de autenticación
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'authToken' || e.key === 'user') {
+        updateMenu();
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,285 @@
+---
+
+---
+
+<h1 class="text-3xl font-semibold text-gray-800 text-center mt-5 mb-8">
+  Página de Administrador de PC's PreConfiguradas
+</h1> 
+
+<div class="p-6 bg-white rounded-lg shadow-md max-w-7xl mx-auto mb-8">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold text-gray-800">Configuraciones de PC</h2>
+    <button onclick="openModal()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+      + Nueva Configuración
+    </button>
+  </div>
+
+  <table class="w-full table-auto border-collapse" id="configTable">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Servicio</th>
+        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Componentes</th>
+        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div
+  id="formModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+>
+  <div
+    class="bg-white w-96 p-6 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+  >
+    <h2 class="text-2xl font-semibold mb-4">Nueva Configuración de PC</h2>
+
+    <form id="pcForm" class="flex flex-col gap-3">
+      <label class="font-medium">Nombre:</label>
+      <input
+        type="text"
+        id="pcName"
+        class="border px-3 py-2 rounded"
+        required
+      />
+
+      <label class="font-medium">Monto Servicio:</label>
+      <input
+        type="number"
+        id="serviceAmount"
+        class="border px-3 py-2 rounded"
+        required
+      />
+
+      <label class="font-medium">Componentes:</label>
+      <p class="text-sm text-gray-600">Selecciona componentes</p>
+
+      <!-- PANEL TIENDA -->
+      <div class="bg-gray-50 p-3 rounded-lg border">
+        <h3 class="font-semibold mb-2">Tienda de Componentes</h3>
+
+        <input
+          id="searchComponent"
+          oninput="filterComponents()"
+          placeholder="Buscar..."
+          class="w-full border px-3 py-2 rounded mb-2"
+        />
+
+        <select
+          id="typeFilter"
+          onchange="filterComponents()"
+          class="w-full border px-3 py-2 rounded mb-3"
+        >
+          <option value="">Filtrar por Tipo</option>
+          <option value="Procesador">Procesador</option>
+          <option value="Tarjeta Gráfica">Tarjeta Gráfica</option>
+          <option value="RAM">RAM</option>
+          <option value="Almacenamiento">Almacenamiento</option>
+          <option value="Fuente de Poder">Fuente de Poder</option>
+          <option value="Gabinete">Gabinete</option>
+        </select>
+
+        <div id="availableComponents" class="max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <!-- PANEL SELECCIONADOS -->
+      <div class="bg-blue-50 p-3 rounded-lg border">
+        <h3 class="font-semibold mb-2">Seleccionados</h3>
+        <div id="selectedComponents" class="min-h-[60px]"></div>
+      </div>
+
+      <div class="flex gap-3 mt-4">
+        <button
+          type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full"
+        >
+          Guardar
+        </button>
+
+        <button
+          type="button"
+          onclick="closeModal()"
+          class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 w-full"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script is:raw>
+  const allComponents = [
+    { id: 1, name: "Intel Core i9-13900K", type: "Procesador", price: 589 },
+    { id: 2, name: "AMD Ryzen 9 7950X", type: "Procesador", price: 699 },
+    { id: 3, name: "NVIDIA RTX 4090", type: "Tarjeta Gráfica", price: 1599 },
+    { id: 4, name: "AMD RX 7900 XTX", type: "Tarjeta Gráfica", price: 999 },
+    { id: 5, name: "Corsair 32GB DDR5", type: "RAM", price: 179 },
+    { id: 6, name: "Samsung 980 PRO 2TB", type: "Almacenamiento", price: 249 },
+    { id: 7, name: "Corsair RM850x", type: "Fuente de Poder", price: 149 },
+    { id: 8, name: "NZXT H710i", type: "Gabinete", price: 169 },
+  ];
+
+  const configurations = [
+    {
+      id: "RF_APC001",
+      name: "PC Gaming OMEGA",
+      serviceAmount: 1500,
+      components: [1, 3, 5, 6, 7, 8],
+    },
+  ];
+
+  let selectedComponentIds = [];
+  let filteredComponents = [...allComponents];
+
+  function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    configurations.forEach((c) => {
+      const names = c.components
+        .map((id) => allComponents.find((x) => x.id === id)?.name)
+        .join(", ");
+
+      tbody.innerHTML += `
+        <tr>
+          <td class="pr-12 py-3 text-right">${c.id}</td>
+          <td class="pr-12 py-3 text-right">${c.name}</td>
+          <td class="pr-12 py-3 text-right">$${c.serviceAmount}</td>
+          <td class="pr-12 py-3 text-right text-sm text-gray-600">${names}</td>
+          <td class="pr-12 py-3 text-right">
+            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">Editar</button>
+            <button onclick="deleteConfig('${c.id}')"
+              class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderAvailableComponents() {
+    const c = document.getElementById("availableComponents");
+    c.innerHTML = "";
+
+    filteredComponents.forEach((comp) => {
+      const selected = selectedComponentIds.includes(comp.id);
+      const div = document.createElement("div");
+
+      div.className = "p-2 border rounded-lg mb-2 bg-white";
+      div.style.opacity = selected ? "0.5" : "1";
+
+      div.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div>
+            <strong>${comp.name}</strong>
+            <p class="text-xs text-gray-600">${comp.type} - $${comp.price}</p>
+          </div>
+          <button onclick="toggleComponent(${comp.id})"
+            class="px-3 py-1 text-white rounded-lg ${selected ? "bg-red-500" : "bg-green-500"}">
+            ${selected ? "✕" : "+"}
+          </button>
+        </div>
+      `;
+
+      c.appendChild(div);
+    });
+  }
+
+  function renderSelectedComponents() {
+    const cont = document.getElementById("selectedComponents");
+
+    if (selectedComponentIds.length === 0) {
+      cont.innerHTML = `<p class="text-center text-gray-500">Vacío</p>`;
+      return;
+    }
+
+    cont.innerHTML = "";
+    selectedComponentIds.forEach((id) => {
+      const comp = allComponents.find((x) => x.id === id);
+
+      const div = document.createElement("div");
+      div.className = "p-2 border rounded-lg mb-2 bg-white";
+
+      div.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div>
+            <strong>${comp.name}</strong>
+            <p class="text-xs text-gray-600">${comp.type} - $${comp.price}</p>
+          </div>
+          <button onclick="toggleComponent(${comp.id})"
+            class="px-3 py-1 bg-red-500 text-white rounded-lg">
+            Quitar
+          </button>
+        </div>
+      `;
+
+      cont.appendChild(div);
+    });
+  }
+
+  function toggleComponent(id) {
+    const idx = selectedComponentIds.indexOf(id);
+    if (idx > -1) selectedComponentIds.splice(idx, 1);
+    else selectedComponentIds.push(id);
+
+    renderAvailableComponents();
+    renderSelectedComponents();
+  }
+
+  function filterComponents() {
+    const text = document.getElementById("searchComponent").value.toLowerCase();
+    const type = document.getElementById("typeFilter").value;
+
+    filteredComponents = allComponents.filter(
+      (c) => c.name.toLowerCase().includes(text) && (!type || c.type === type)
+    );
+
+    renderAvailableComponents();
+  }
+
+  function openModal() {
+    document.getElementById("formModal").classList.remove("hidden");
+    selectedComponentIds = [];
+    renderAvailableComponents();
+    renderSelectedComponents();
+  }
+
+  function closeModal() {
+    document.getElementById("formModal").classList.add("hidden");
+    document.getElementById("pcForm").reset();
+  }
+
+  document.getElementById("pcForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    configurations.push({
+      id: "RF_APC" + String(configurations.length + 1).padStart(3, "0"),
+      name: document.getElementById("pcName").value,
+      serviceAmount: parseFloat(document.getElementById("serviceAmount").value),
+      components: [...selectedComponentIds],
+    });
+
+    closeModal();
+    renderTable();
+    alert("Guardado!");
+  });
+
+  function deleteConfig(id) {
+    if (!confirm("¿Eliminar?")) return;
+
+    const index = configurations.findIndex((c) => c.id === id);
+    if (index > -1) configurations.splice(index, 1);
+
+    renderTable();
+  }
+
+  renderTable();
+</script>

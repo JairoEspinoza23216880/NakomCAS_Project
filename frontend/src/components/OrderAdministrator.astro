@@ -1,0 +1,219 @@
+---
+
+---
+
+<div class="p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-semibold mb-4">Administrar Pedidos</h2>
+
+  <table class="w-full table-auto border-collapse">
+    <thead>
+      <tr class="bg-gray-200">
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >ID del Pedido</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Nombre del Cliente</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Fecha del pedido</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Estado Actual</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Precio Total</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Acciones</th
+        >
+      </tr>
+    </thead>
+
+    <tbody id="tabla-pedidos"></tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div
+  id="modal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+>
+  <div class="bg-white w-96 p-6 rounded-lg shadow-xl">
+    <h3 class="text-xl font-semibold mb-4">Detalles del Pedido</h3>
+
+    <p><strong>ID:</strong> <span id="m-id"></span></p>
+    <p><strong>Cliente:</strong> <span id="m-cliente"></span></p>
+    <p><strong>Email:</strong> <span id="m-email"></span></p>
+    <p><strong>Teléfono:</strong> <span id="m-phone"></span></p>
+    <p><strong>Fecha:</strong> <span id="m-fecha"></span></p>
+    <p><strong>Precio:</strong> <span id="m-total"></span></p>
+    <p><strong>Estado:</strong> <span id="m-estado"></span></p>
+
+    <button
+      onclick="closeModal()"
+      class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full"
+    >
+      Cerrar
+    </button>
+  </div>
+</div>
+<!-- Modal de confirmación -->
+<div
+  id="modalEliminar"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+    <h2 class="text-lg font-semibold mb-4">¿Eliminar pedido?</h2>
+    <p class="mb-4 text-sm text-gray-600">Esta acción no se puede deshacer.</p>
+    <div class="flex justify-end gap-3">
+      <button onclick="cerrarModal()" class="px-3 py-1 bg-gray-300 rounded"
+        >Cancelar</button
+      >
+      <button
+        id="btnConfirmarEliminar"
+        class="px-3 py-1 bg-red-500 text-white rounded">Eliminar</button
+      >
+    </div>
+  </div>
+</div>
+
+<script is:"client">
+  const pedidos = [
+    {
+      id: 12345,
+      cliente: "Pedrito Picapiedra",
+      email: "pedrito@example.com",
+      telefono: "+52 999 123 456",
+      fecha: "21/11/2024",
+      estado: "Esperando Pago",
+      total: "$1500.00",
+    },
+    {
+      id: 67890,
+      cliente: "Juan Pérez",
+      email: "juan@example.com",
+      telefono: "+52 999 777 888",
+      fecha: "20/11/2024",
+      estado: "Preparando Componentes",
+      total: "$2400.00",
+    },
+  ];
+
+  const statusOptions = [
+    "Esperando Pago",
+    "Pago Confirmado",
+    "Preparando Componentes",
+    "Ensamblando PC",
+    "Listo para Envío",
+    "Enviado",
+    "Entregado",
+  ];
+
+  // ✔ TABLA PRINCIPAL (la tuya)
+  function cargarTabla() {
+    const tbody = document.getElementById("tabla-pedidos");
+    tbody.innerHTML = "";
+
+    pedidos.forEach((p) => {
+      const fila = document.createElement("tr");
+
+      fila.innerHTML = `
+        <td class="pr-12 py-3 text-right">${p.id}</td>
+        <td class="pr-12 py-3 text-right">${p.cliente}</td>
+        <td class="pr-12 py-3 text-right">${p.fecha}</td>
+
+        <td class="pr-12 py-3 text-right">
+          <select onchange="ActualizarEstado(${p.id}, this.value)"
+            class="border rounded px-2 py-1">
+            ${statusOptions
+              .map(
+                (s) =>
+                  `<option value="${s}" ${s === p.estado ? "selected" : ""}>${s}</option>`
+              )
+              .join("")}
+          </select>
+        </td>
+
+        <td class="pr-12 py-3 text-right">${p.total}</td>
+
+        <td class="pr-12 py-3 text-right">
+          <button onclick='verDetalles(${p.id})'
+            class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">
+            Ver Detalles
+          </button>
+
+          <button onclick='confirmarEliminar(${p.id})'
+            class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">
+            Eliminar
+          </button>
+        </td>
+      `;
+
+      tbody.appendChild(fila);
+    });
+  }
+
+  // ✔ Modal detalles
+  function verDetalles(id) {
+    const p = pedidos.find((x) => x.id == id);
+
+    document.getElementById("m-id").textContent = p.id;
+    document.getElementById("m-cliente").textContent = p.cliente;
+    document.getElementById("m-email").textContent = p.email;
+    document.getElementById("m-phone").textContent = p.telefono;
+    document.getElementById("m-fecha").textContent = p.fecha;
+    document.getElementById("m-total").textContent = p.total;
+    document.getElementById("m-estado").textContent = p.estado;
+
+    document.getElementById("modal").classList.remove("hidden");
+  }
+
+  function closeModal() {
+    document.getElementById("modal").classList.add("hidden");
+  }
+
+  // ✔ Actualizar estado
+  function ActualizarEstado(id, nuevoEstado) {
+    const pedido = pedidos.find((p) => p.id === id);
+    if (pedido) {
+      pedido.estado = nuevoEstado;
+      cargarTabla();
+    }
+  }
+
+  // ✔ Modal eliminar
+  let idAEliminar = null;
+
+  function confirmarEliminar(id) {
+    idAEliminar = id;
+    document.getElementById("modalEliminar").classList.remove("hidden");
+  }
+
+  function cerrarModal() {
+    idAEliminar = null;
+    document.getElementById("modalEliminar").classList.add("hidden");
+  }
+
+  document.getElementById("btnConfirmarEliminar").onclick = () => {
+    if (idAEliminar !== null) eliminarPedido(idAEliminar);
+    cerrarModal();
+  };
+
+  // ✔ Eliminar pedido
+  function eliminarPedido(id) {
+    const index = pedidos.findIndex((p) => p.id === id);
+    if (index !== -1) {
+      pedidos.splice(index, 1);
+      cargarTabla();
+    }
+  }
+
+  // 🔥 Inicializa
+  cargarTabla();
+</script>

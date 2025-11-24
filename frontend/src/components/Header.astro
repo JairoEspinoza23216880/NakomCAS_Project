@@ -1,5 +1,5 @@
 ---
-import User from "./User.astro"
+import UserAuth from "../components/UserAuth.astro"
 ---
 
 <header class="flex justify-between items-center px-8 py-3.5 bg-white shadow-sm">
@@ -22,6 +22,7 @@ import User from "./User.astro"
     <a href="/#" class="font-semibold text-gray-800 hover:text-gray-400 transition-colors mt-1">Inicio</a>
     <a href="/Configuration" class="font-semibold text-gray-800 hover:text-gray-400 transition-colors mt-1">Configuración</a>
     <a href="/Contact" class="font-semibold text-gray-800 hover:text-gray-400 transition-colors mt-1">Contacto</a>
-    <User client:load/>
+    <a href="/UserOrder" class="font-semibold text-gray-800 hover:text-gray-400 transition-colors mt-1">Mis Pedidos</a>
+    <UserAuth client:load/>
   </nav>
 </header>

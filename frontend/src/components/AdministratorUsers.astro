@@ -1,0 +1,374 @@
+---
+
+---
+
+<!-- Pagina de administrador de Usuarios -->
+ <!-- Solo usuarios de tipo Vendedor deben entrar -->
+<div
+  id="admin-usuarios"
+  class="p-6 bg-white rounded-lg shadow-md"
+  data-api-base="../api/usuarios"
+>
+  <h2 class="text-2xl font-semibold mb-4">Administrar Usuarios</h2>
+
+  <table class="w-full table-auto border-collapse">
+    <thead>
+      <tr class="bg-gray-200">
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >ID</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Nombre</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Apellido</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Correo Electrónico</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Telefóno</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Rol</th
+        >
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Estado</th
+        >
+        <!-- Estado entre Activo e inactivo 
+                                                                Esto impide que el usuario inicie sensión en el futuro. 
+                                                                No borra datos, por consecuencia, tambien debe haber 
+                                                                una forma de reactivarlo.-->
+        <th
+          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          >Acciones</th
+        >
+      </tr>
+    </thead>
+    <tbody id="tabla-usuarios">
+      <!-- Filas generadas dinámicamente -->
+    </tbody>
+  </table>
+  <!-- Cración de Cliente de manera manual -->
+  <div class="mt-6">
+    <button
+      class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
+    >
+      Crear Nuevo Usuario
+    </button>
+    <!-- El Rol solo se edita desde la base de datos directa -->
+  </div>
+  <!-- Modal para crear/editar usuario -->
+  <div
+    id="usuario-modal"
+    class="fixed inset-0 hidden items-center justify-center z-50"
+  >
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div
+      class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 relative z-10"
+    >
+      <div class="p-4 border-b flex justify-between items-center">
+        <h3 id="modal-title" class="text-lg font-semibold">Crear Usuario</h3>
+        <button id="modal-close" class="text-gray-500 hover:text-gray-700"
+          >✕</button
+        >
+      </div>
+      <form id="usuario-form" class="p-4 space-y-3">
+        <input type="hidden" name="id" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          <input
+            name="nombre"
+            class="mt-1 block w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Apellido</label
+          >
+          <input
+            name="apellido"
+            class="mt-1 block w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            name="email"
+            type="email"
+            class="mt-1 block w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Teléfono</label
+          >
+          <input
+            name="telefono"
+            class="mt-1 block w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Rol</label>
+          <input
+            name="rol"
+            class="mt-1 block w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div id="password-row">
+          <label class="block text-sm font-medium text-gray-700"
+            >Contraseña</label
+          >
+          <input
+            name="password"
+            type="password"
+            class="mt-1 block w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            id="modal-cancel"
+            class="px-4 py-2 rounded border">Cancelar</button
+          >
+          <button
+            type="submit"
+            id="modal-save"
+            class="px-4 py-2 rounded bg-blue-600 text-white">Guardar</button
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Lee la base de la API desde el atributo data-api-base del contenedor
+    function getApiBase() {
+      const container = document.getElementById("admin-usuarios");
+      return (
+        (container && container.dataset && container.dataset.apiBase) ||
+        "/api/usuarios"
+      );
+    }
+
+    // Normaliza distintos esquemas que pueda devolver un backend Java
+    function mapUserFromApi(u) {
+      return {
+        id: u.id ?? u.userId ?? u.uid ?? null,
+        nombre: u.nombre ?? u.firstName ?? u.name ?? "",
+        apellido: u.apellido ?? u.lastName ?? "",
+        email: u.email ?? u.emailAddress ?? "",
+        telefono: u.telefono ?? u.phone ?? u.telefonoMovil ?? "",
+        rol: u.rol ?? u.role ?? u.tipo ?? "",
+        activo: (u.activo ?? u.active ?? u.enabled) === false ? false : true,
+      };
+    }
+
+    async function fetchUsuarios() {
+      const apiBase = getApiBase();
+      try {
+        const res = await fetch(apiBase);
+        if (!res.ok) throw new Error("Error al obtener usuarios");
+        const data = await res.json();
+        // data puede ser un objeto con lista en `data` o directamente un array
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
+        return list.map(mapUserFromApi);
+      } catch (err) {
+        console.error("fetchUsuarios:", err);
+        return null;
+      }
+    }
+
+    function renderUsuarios(usuarios) {
+      const tbody = document.querySelector("#tabla-usuarios");
+      tbody.innerHTML = "";
+
+      if (!usuarios || usuarios.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">No hay usuarios disponibles</td></tr>`;
+        return;
+      }
+
+      usuarios.forEach((u) => {
+        const estado = u.activo === false ? "Inactivo" : "Activo";
+        tbody.innerHTML += `
+          <tr>
+            <td class="pr-12 py-3 text-xs text-gray-700">${u.id ?? ""}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">${u.nombre}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">${u.apellido}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700 email-lower">${u.email}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">${u.telefono}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">${u.rol}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">${estado}</td>
+            <td class="pr-12 py-3 text-xs text-gray-700">
+              <button data-id="${u.id}" class="editar-btn bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">Editar</button>
+              <button data-id="${u.id}" class="eliminar-btn bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      // Añadir listeners (delegación simple)
+      document.querySelectorAll(".editar-btn").forEach((btn) =>
+        btn.addEventListener("click", (e) => {
+          const id = e.currentTarget.dataset.id;
+          editarUsuario(Number(id));
+        })
+      );
+      document.querySelectorAll(".eliminar-btn").forEach((btn) =>
+        btn.addEventListener("click", (e) => {
+          const id = e.currentTarget.dataset.id;
+          eliminarUsuario(Number(id));
+        })
+      );
+    }
+
+    async function cargarTabla() {
+      const usuarios = await fetchUsuarios();
+      if (usuarios === null) {
+        // Mostrar ejemplo local si la API no responde
+        renderUsuarios([
+          {
+            id: 1,
+            nombre: "Pedro",
+            apellido: "Picapiedras",
+            email: "pedrito@picapiedras.com",
+            telefono: "555-1234",
+            rol: "Vendedor",
+            activo: true,
+          },
+        ]);
+        return;
+      }
+      renderUsuarios(usuarios);
+    }
+
+    // Abrir modal en modo editar y prefilar datos
+    async function editarUsuario(id) {
+      const usuarios = await fetchUsuarios();
+      if (!usuarios) return alert("No se pudo obtener usuario");
+      const user = usuarios.find((u) => Number(u.id) === Number(id));
+      if (!user) return alert("Usuario no encontrado");
+      openModal("Editar Usuario", user);
+    }
+
+    async function eliminarUsuario(id) {
+      const apiBase = getApiBase();
+      if (!confirm("¿Seguro que deseas desactivar este usuario?")) return;
+      try {
+        const res = await fetch(`${apiBase}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activo: false }),
+        });
+        if (!res.ok) throw new Error("Error al desactivar");
+        await cargarTabla();
+        alert("Usuario desactivado correctamente");
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar/desactivar usuario");
+      }
+    }
+
+    // Abrir modal en modo crear
+    function crearUsuario() {
+      openModal("Crear Usuario");
+    }
+
+    // Modal helpers
+    function openModal(title, user = null) {
+      const modal = document.getElementById("usuario-modal");
+      const titleEl = document.getElementById("modal-title");
+      const form = document.getElementById("usuario-form");
+      titleEl.textContent = title;
+      form.reset();
+      // Mostrar/ocultar campo password (en editar opcional)
+      const passwordRow = document.getElementById("password-row");
+      if (user) {
+        form.id.value = user.id ?? "";
+        form.nombre.value = user.nombre ?? "";
+        form.apellido.value = user.apellido ?? "";
+        form.email.value = user.email ?? "";
+        form.telefono.value = user.telefono ?? "";
+        form.rol.value = user.rol ?? "";
+        // en editar no requerimos cambiar contraseña
+        if (passwordRow) passwordRow.style.display = "none";
+      } else {
+        form.id.value = "";
+        if (passwordRow) passwordRow.style.display = "";
+      }
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("usuario-modal");
+      modal.classList.remove("flex");
+      modal.classList.add("hidden");
+    }
+
+    // Manejar submit del formulario
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("usuario-form");
+      const btnClose = document.getElementById("modal-close");
+      const btnCancel = document.getElementById("modal-cancel");
+      const containerBtnCrear = document.querySelector(".mt-6 button");
+      if (containerBtnCrear)
+        containerBtnCrear.addEventListener("click", crearUsuario);
+      if (btnClose)
+        btnClose.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal();
+        });
+      if (btnCancel)
+        btnCancel.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal();
+        });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const apiBase = getApiBase();
+        const fd = new FormData(form);
+        const payload = Object.fromEntries(fd.entries());
+        const id = payload.id;
+        // Eliminar id del payload para POST
+        if (id === "" || id === "undefined" || id == null) delete payload.id;
+        // Si password vacío, eliminar para no sobrescribir
+        if (!payload.password) delete payload.password;
+
+        try {
+          const method = id ? "PUT" : "POST";
+          const url = id ? `${apiBase}/${id}` : apiBase;
+          const res = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error("Error en la operación");
+          await cargarTabla();
+          closeModal();
+          alert(id ? "Usuario actualizado" : "Usuario creado");
+        } catch (err) {
+          console.error("form submit:", err);
+          alert("Error al guardar usuario");
+        }
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnCrear = document.querySelector(".mt-6 button");
+      if (btnCrear) btnCrear.addEventListener("click", crearUsuario);
+      cargarTabla();
+    });
+  </script>
+</div>
