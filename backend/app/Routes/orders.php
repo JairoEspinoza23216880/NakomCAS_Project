@@ -16,6 +16,12 @@ use App\Middleware\JwtMiddleware;
 use Illuminate\Database\Capsule\Manager as DB;
 
 return function (App $app) {
+
+    /**
+     * CREACIÓN DE PEDIDO
+     * Endpoint: POST /api/orders
+     * Objetivo: Crear un nuevo pedido con kits y personalización
+     */
     $app->post('/api/orders', function (Request $request, Response $response) {
 
         // 1. Obtener datos del cuerpo y usuario autenticado
@@ -148,5 +154,133 @@ return function (App $app) {
             'order_id' => $order->id
         ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+    })->add(new JwtMiddleware());
+
+
+
+    /**
+     * LISTAR MIS PEDIDOS
+     * Endpoint: GET /api/orders
+     * Objetivo: Obtener la lista histórica de pedidos del usuario autenticado
+     */
+    $app->get('/api/orders', function (Request $request, Response $response) {
+        try {
+            // 1. Obtener usuario autenticado desde el token
+            $user = $request->getAttribute('user');
+            $userId = $user->sub ?? $user->id;
+
+            // 2. Consultar pedidos del usuario
+            $orders = Order::where('user_id', $userId)->with('components')->orderBy('created_at', 'desc')->get();
+
+            // 3. Formatear respuesta según contrato
+            $result = [];
+            foreach ($orders as $order) {
+                // Generar nombre resumen (puedes ajustar la lógica según tu modelo)
+                $summary = '';
+                $kits = [];
+                // Buscar componentes que sean parte de kits funcionales y estructurales
+                foreach ($order->components as $component) {
+                    $kits[] = $component->name;
+                }
+                if (!empty($kits)) {
+                    $summary = implode(' + ', $kits);
+                } else {
+                    $summary = 'Pedido sin kits';
+                }
+                $result[] = [
+                    'id' => $order->id,
+                    'date' => $order->created_at,
+                    'status' => $order->status,
+                    'total_price' => $order->total_price,
+                    'summary_name' => $summary
+                ];
+            }
+
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'orders' => $result
+            ]));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    })->add(new JwtMiddleware());
+
+
+
+    /**
+     * DETALLE DE PEDIDO
+     * Endpoint: GET /api/orders/{id}
+     * Objetivo: Obtener el detalle completo de un pedido del usuario autenticado
+     */
+    $app->get('/api/orders/{id}', function (Request $request, Response $response, array $args) {
+        try {
+            // 1. Obtener usuario autenticado desde el token
+            $user = $request->getAttribute('user');
+            $userId = $user->sub ?? $user->id;
+            $orderId = $args['id'];
+
+            // 2. Validar que el ID sea numérico
+            if (!is_numeric($orderId)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El ID de pedido debe ser numérico.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // 3. Buscar el pedido por ID
+            $order = Order::where('id', $orderId)->with('components')->first();
+            if (!$order) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'No se encontró el pedido solicitado.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            // 4. Verificar que el pedido pertenezca al usuario
+            if ($order->user_id != $userId) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'No tienes permiso para ver este pedido.'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+            }
+
+            // 5. Construir detalle de componentes
+            $components = [];
+            foreach ($order->components as $component) {
+                $pivot = $component->pivot ?? null;
+                $components[] = [
+                    'id' => $component->id,
+                    'name' => $component->name,
+                    'quantity' => $pivot->quantity ?? 1,
+                    'price_at_purchase' => $pivot->price_at_purchase ?? $component->price
+                ];
+            }
+
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'order' => [
+                    'id' => $order->id,
+                    'date' => $order->created_at,
+                    'status' => $order->status,
+                    'total_price' => $order->total_price,
+                    'components' => $components
+                ]
+            ]));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
     })->add(new JwtMiddleware());
 };
