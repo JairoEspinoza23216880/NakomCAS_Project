@@ -170,7 +170,7 @@ return function (App $app) {
 
 
         // 2. Consultar pedidos del usuario
-        $orders = Order::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $orders = Order::where('user_id', $userId)->with('components')->orderBy('created_at', 'desc')->get();
 
 
         // 3. Formatear respuesta según contrato
@@ -214,8 +214,17 @@ return function (App $app) {
         $userId = $user->sub ?? $user->id;
         $orderId = $args['id'];
 
+        // Validar que el ID es numérico
+        if (!is_numeric($orderId)) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'ID de pedido inválido.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
         // 2. Buscar el pedido
-        $order = Order::find($orderId);
+        $order = Order::with('components')->find($orderId);
         if (!$order) {
             $response->getBody()->write(json_encode([
                 'success' => false,
@@ -238,7 +247,7 @@ return function (App $app) {
         foreach ($order->components as $component) {
             $components[] = [
                 'name' => $component->name,
-                'price' => $component->price,
+                'price' => $component->pivot->price_at_purchase,
                 'quantity' => $component->pivot->quantity
             ];
         }
