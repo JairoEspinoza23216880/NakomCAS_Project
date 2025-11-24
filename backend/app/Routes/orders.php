@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderXComponent;
 use App\Models\Component;
 use App\Middleware\JwtMiddleware;
+use Illuminate\Database\Capsule\Manager as DB;
 
 return function (App $app) {
     $app->post('/api/orders', function (Request $request, Response $response) {
@@ -21,7 +22,7 @@ return function (App $app) {
         $body = $request->getParsedBody();
         $user = $request->getAttribute('user');
 
-        // Validar datos requeridos
+        // 2. Validar datos requeridos
         $required = ['functional_kit_id', 'structural_kit_id', 'personalization_ids', 'total_price'];
         foreach ($required as $field) {
             if (!isset($body[$field])) {
@@ -33,7 +34,7 @@ return function (App $app) {
             }
         }
 
-        // Obtener componentes de los kits
+        // 3. Obtener y validar kits
         $functionalKit = FunctionalKit::find($body['functional_kit_id']);
         $structuralKit = StructuralKit::find($body['structural_kit_id']);
         if (!$functionalKit || !$structuralKit) {
@@ -44,42 +45,47 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
+        // 4. Construir lista de componentes (kits y personalización)
         $components = collect();
-
-        // Componentes funcionales
+        // 4.1 Componentes funcionales
         foreach ($functionalKit->components as $comp) {
             $components->push([
                 'component' => $comp,
                 'quantity' => $comp->pivot->quantity
             ]);
         }
-
-        // Componentes estructurales
+        // 4.2 Componentes estructurales
         foreach ($structuralKit->components as $comp) {
             $components->push([
                 'component' => $comp,
                 'quantity' => $comp->pivot->quantity
             ]);
         }
-
-        // Componentes de personalización
+        // 4.3 Componentes de personalización (el id recibido es el id del componente)
         $personalizationIds = $body['personalization_ids'];
         if (!is_array($personalizationIds)) $personalizationIds = [];
-        foreach ($personalizationIds as $pid) {
-            $pers = DanielMapPersonalization::find($pid);
-            if ($pers) {
-                // Asumimos que la personalización es un componente extra
-                $comp = Component::find($pid);
-                if ($comp) {
-                    $components->push([
-                        'component' => $comp,
-                        'quantity' => 1
-                    ]);
-                }
+        $invalidPersonalizationIds = [];
+        foreach ($personalizationIds as $compId) {
+            $comp = Component::find($compId);
+            if ($comp) {
+                $components->push([
+                    'component' => $comp,
+                    'quantity' => 1
+                ]);
+            } else {
+                $invalidPersonalizationIds[] = $compId;
             }
         }
+        // 5. Validar existencia de componentes de personalización
+        if (count($invalidPersonalizationIds) > 0) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Los siguientes IDs de personalización no existen: ' . implode(', ', $invalidPersonalizationIds)
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
 
-        // Validar stock de todos los componentes
+        // 6. Validar stock de todos los componentes
         foreach ($components as $item) {
             $comp = $item['component'];
             $qty = $item['quantity'];
@@ -92,27 +98,50 @@ return function (App $app) {
             }
         }
 
-        // Crear el pedido
-        $order = Order::create([
-            'user_id' => $user->sub ?? $user->id ?? null,
-            'total_price' => $body['total_price'],
-            'status' => 'pendiente'
-        ]);
-
-        // Guardar componentes en la tabla pivote
-        foreach ($components as $item) {
-            $comp = $item['component'];
-            $qty = $item['quantity'];
-            // Guardar snapshot del precio actual
-            $order->components()->attach($comp->id, [
-                'quantity' => $qty,
-                'price_at_purchase' => $comp->price
-            ]);
-            // Descontar stock
-            $comp->stock -= $qty;
-            $comp->save();
+        // 7. Validar precio
+        $totalPrice = $body['total_price'];
+        if (!is_numeric($totalPrice) || $totalPrice <= 0) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'El precio debe ser un número positivo.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
+        // 8. Crear pedido y descontar stock en transacción
+        try {
+            DB::beginTransaction();
+
+            // 8.1 Crear pedido
+            $order = Order::create([
+                'user_id' => $user->sub ?? $user->id,
+                'total_price' => $totalPrice,
+                'status' => 'pendiente'
+            ]);
+
+            // 8.2 Guardar componentes y descontar stock
+            foreach ($components as $item) {
+                $comp = $item['component'];
+                $qty = $item['quantity'];
+                $order->components()->attach($comp->id, [
+                    'quantity' => $qty,
+                    'price_at_purchase' => $comp->price
+                ]);
+                $comp->stock -= $qty;
+                $comp->save();
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error al crear el pedido: ' . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+
+        // 9. Responder éxito
         $response->getBody()->write(json_encode([
             'success' => true,
             'message' => "Pedido #{$order->id} creado.",
