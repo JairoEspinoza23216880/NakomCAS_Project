@@ -28,6 +28,7 @@ return function (App $app) {
         $body = $request->getParsedBody();
         $user = $request->getAttribute('user');
 
+
         // 2. Validar datos requeridos
         $required = ['functional_kit_id', 'structural_kit_id', 'personalization_ids', 'total_price'];
         foreach ($required as $field) {
@@ -40,6 +41,7 @@ return function (App $app) {
             }
         }
 
+
         // 3. Obtener y validar kits
         $functionalKit = FunctionalKit::find($body['functional_kit_id']);
         $structuralKit = StructuralKit::find($body['structural_kit_id']);
@@ -51,6 +53,7 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
+
         // 4. Construir lista de componentes (kits y personalización)
         $components = collect();
         // 4.1 Componentes funcionales
@@ -60,6 +63,7 @@ return function (App $app) {
                 'quantity' => $comp->pivot->quantity
             ]);
         }
+
         // 4.2 Componentes estructurales
         foreach ($structuralKit->components as $comp) {
             $components->push([
@@ -67,6 +71,7 @@ return function (App $app) {
                 'quantity' => $comp->pivot->quantity
             ]);
         }
+
         // 4.3 Componentes de personalización (el id recibido es el id del componente)
         $personalizationIds = $body['personalization_ids'];
         if (!is_array($personalizationIds)) $personalizationIds = [];
@@ -82,6 +87,8 @@ return function (App $app) {
                 $invalidPersonalizationIds[] = $compId;
             }
         }
+
+
         // 5. Validar existencia de componentes de personalización
         if (count($invalidPersonalizationIds) > 0) {
             $response->getBody()->write(json_encode([
@@ -90,6 +97,7 @@ return function (App $app) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
+
 
         // 6. Validar stock de todos los componentes
         foreach ($components as $item) {
@@ -104,6 +112,7 @@ return function (App $app) {
             }
         }
 
+
         // 7. Validar precio
         $totalPrice = $body['total_price'];
         if (!is_numeric($totalPrice) || $totalPrice <= 0) {
@@ -113,6 +122,7 @@ return function (App $app) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
+
 
         // 8. Crear pedido y descontar stock en transacción
         try {
@@ -147,6 +157,7 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
 
+
         // 9. Responder éxito
         $response->getBody()->write(json_encode([
             'success' => true,
@@ -165,12 +176,15 @@ return function (App $app) {
      */
     $app->get('/api/orders', function (Request $request, Response $response) {
         try {
+
             // 1. Obtener usuario autenticado desde el token
             $user = $request->getAttribute('user');
             $userId = $user->sub ?? $user->id;
 
+
             // 2. Consultar pedidos del usuario
             $orders = Order::where('user_id', $userId)->with('components')->orderBy('created_at', 'desc')->get();
+
 
             // 3. Formatear respuesta según contrato
             $result = [];
@@ -196,12 +210,19 @@ return function (App $app) {
                 ];
             }
 
+
+            // 4. Crear respuesta
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'orders' => $result
             ]));
+
+
+            // 5. Enviar respuesta
             return $response->withHeader('Content-Type', 'application/json');
         } catch (\Exception $e) {
+
+            // 6. Manejar errores inesperados
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error inesperado: ' . $e->getMessage()
@@ -219,10 +240,12 @@ return function (App $app) {
      */
     $app->get('/api/orders/{id}', function (Request $request, Response $response, array $args) {
         try {
+
             // 1. Obtener usuario autenticado desde el token
             $user = $request->getAttribute('user');
             $userId = $user->sub ?? $user->id;
             $orderId = $args['id'];
+
 
             // 2. Validar que el ID sea numérico
             if (!is_numeric($orderId)) {
@@ -232,6 +255,7 @@ return function (App $app) {
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
+
 
             // 3. Buscar el pedido por ID
             $order = Order::where('id', $orderId)->with('components')->first();
@@ -243,6 +267,7 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
+
             // 4. Verificar que el pedido pertenezca al usuario
             if ($order->user_id != $userId) {
                 $response->getBody()->write(json_encode([
@@ -251,6 +276,7 @@ return function (App $app) {
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
             }
+
 
             // 5. Construir detalle de componentes
             $components = [];
@@ -264,6 +290,8 @@ return function (App $app) {
                 ];
             }
 
+
+            // 6. Crear respuesta
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'order' => [
@@ -274,8 +302,13 @@ return function (App $app) {
                     'components' => $components
                 ]
             ]));
+
+
+            // 7. Enviar respuesta
             return $response->withHeader('Content-Type', 'application/json');
         } catch (\Exception $e) {
+
+            // 8. Manejar errores inesperados
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error inesperado: ' . $e->getMessage()
