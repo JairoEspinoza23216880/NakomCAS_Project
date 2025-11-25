@@ -9,74 +9,140 @@ let userData = null;
 
 <div id="user-menu-wrapper" data-authenticated="false">
   <!-- Botón base -->
-  <button id="user-menu-button" class="cursor-pointer items-center text-white rounded-xl">
-    <img src="../../public/img/user.png" alt="imagen usuario" class="w-9 h-9 rounded-full mx-auto">
-    <span id="user-name" class="text-sm text-gray-800 ml-2 hidden md:inline">Usuario</span>
+  <button
+    id="user-menu-button"
+    class="cursor-pointer items-center text-white rounded-xl"
+  >
+    <img
+      src="../../public/img/user.png"
+      alt="imagen usuario"
+      class="w-9 h-9 rounded-full mx-auto"
+    />
+    <span id="user-name" class="text-sm text-gray-800 ml-2 hidden md:inline"
+      >Usuario</span
+    >
   </button>
 
   <!-- Menú base (no logueado) -->
-  <div id="user-menu" class="hidden absolute right-0 mt-2 bg-white text-gray-700 rounded-xl shadow-lg border border-gray-200 z-10">
-    <a href="/Signup" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl">Registrarse</a>
-    <a href="/Login" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl">Iniciar sesión</a>
+  <div
+    id="user-menu"
+    class="hidden absolute right-0 mt-2 bg-white text-gray-700 rounded-xl shadow-lg border border-gray-200 z-10"
+  >
+    <a
+      href="/Signup"
+      class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl"
+      >Registrarse</a
+    >
+    <a
+      href="/Login"
+      class="block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl"
+      >Iniciar sesión</a
+    >
   </div>
 </div>
 
 <script>
   // Este script se ejecuta en el cliente
   (function () {
+    // Función para normalizar el rol (compatible con backend que devuelve 'role' string)
+    function normalizeUserRole(user) {
+      if (!user) return null;
+
+      // Si ya tiene user_role_id, usarlo
+      if (user.user_role_id !== undefined) {
+        return user.user_role_id;
+      }
+
+      // Si tiene 'role' como string, convertirlo
+      if (user.role) {
+        const roleMap = {
+          admin: 1,
+          administrador: 1,
+          vendedor: 1,
+          seller: 1,
+          cliente: 2,
+          customer: 2,
+          user: 2,
+        };
+        return roleMap[user.role.toLowerCase()] || null;
+      }
+
+      return null;
+    }
+
     function updateMenu() {
-      const token = localStorage.getItem('authToken');
-      console.log('Auth Token:', token); // Ahora sí se imprimirá
-      
+      const token = localStorage.getItem("authToken");
       const authenticated = !!token;
       let userData = null;
-      
+
       if (authenticated) {
-        const userString = localStorage.getItem('user');
+        const userString = localStorage.getItem("user");
         if (userString) {
           try {
             userData = JSON.parse(userString);
           } catch (e) {
-            console.error('Error parsing user data:', e);
+            console.error("Error parsing user data:", e);
           }
         }
       }
 
-      const wrapper = document.getElementById('user-menu-wrapper');
-      const userName = document.getElementById('user-name');
-      const menu = document.getElementById('user-menu');
-      const button = document.getElementById('user-menu-button');
+      const wrapper = document.getElementById("user-menu-wrapper");
+      const userName = document.getElementById("user-name");
+      const menu = document.getElementById("user-menu");
+      const button = document.getElementById("user-menu-button");
 
       if (!wrapper || !userName || !menu || !button) return;
 
       // Actualizar estado de autenticación
-      wrapper.setAttribute('data-authenticated', authenticated.toString());
+      wrapper.setAttribute("data-authenticated", authenticated.toString());
 
       if (authenticated) {
         // Usuario logueado
-        userName.textContent = userData?.name || 'Usuario';
-        userName.classList.remove('hidden');
-        
-        // Actualizar menú para usuario logueado
-        menu.innerHTML = `
-          <div class="px-4 py-2 border-b border-gray-100">
-            <p class="font-semibold text-gray-800">${userData?.name || 'Usuario'}</p>
-            <p class="text-sm text-gray-600">${userData?.email || ''}</p>
-          </div>
-          <a href="/AdministratorUsers" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Usuario</a>
-          <a href="/OrderAdministrator" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Pedidos</a>
-          <a href="/AdminComponents" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-componentes</a>
-          <a href="/AdminConfiguradorPC" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-PreConfig</a>
+        userName.textContent = userData?.name || "Usuario";
+        userName.classList.remove("hidden");
 
+        // Verificar si es admin/vendedor usando normalización
+        const userRoleId = normalizeUserRole(userData);
+        const isAdmin = userRoleId === 1;
+
+        console.log("UserAuth - Usuario:", userData);
+        console.log(
+          "UserAuth - Role detectado:",
+          userRoleId,
+          "Es admin:",
+          isAdmin,
+        );
+
+        // Construir menú según rol
+        let menuHTML = `
+          <div class="px-4 py-2 border-b border-gray-100">
+            <p class="font-semibold text-gray-800">${userData?.name || "Usuario"}</p>
+            <p class="text-sm text-gray-600">${userData?.email || ""}</p>
+          </div>
+        `;
+
+        // Solo mostrar opciones admin si es admin/vendedor
+        if (isAdmin) {
+          menuHTML += `
+            <a href="/admin/users" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Usuarios</a>
+            <a href="/admin/orders" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Pedidos</a>
+            <a href="/admin/components" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Componentes</a>
+            <a href="/admin/configurator" class="block px-4 py-2 hover:bg-gray-100 border-b border-gray-100">Admin-Configurador</a>
+          `;
+        }
+
+        menuHTML += `
           <button id="logout-btn" class="cursor-pointer w-full text-left block px-4 py-2 hover:bg-gray-100 hover:rounded-b-xl text-red-600">
             Cerrar sesión
           </button>
         `;
+
+        menu.innerHTML = menuHTML;
       } else {
         // Usuario no logueado
-        userName.textContent = '';
-        userName.classList.add('hidden');
-        
+        userName.textContent = "";
+        userName.classList.add("hidden");
+
         // Restaurar menú para usuario no logueado
         menu.innerHTML = `
           <a href="/Signup" class="block px-4 py-2 hover:bg-gray-100 hover:rounded-t-xl">Registrarse</a>
@@ -109,31 +175,31 @@ let userData = null;
         logoutBtn.replaceWith(logoutBtn.cloneNode(true));
         const newLogoutBtn = document.getElementById("logout-btn");
         newLogoutBtn.addEventListener("click", () => {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("user");
           updateMenu(); // Actualizar menú después del logout
-          location.href = '/Login';      });
+          location.href = "/Login";
+        });
       }
 
       // Cerrar menú al hacer clic fuera
       document.addEventListener("click", (e) => {
-        const target = e.target;
-        if (target && !wrapper.contains(target)) {
+        if (e.target && !wrapper.contains(e.target)) {
           menu.classList.add("hidden");
         }
       });
     }
 
     // Ejecutar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', updateMenu);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", updateMenu);
     } else {
       updateMenu();
     }
 
     // También ejecutar cuando cambie el estado de autenticación
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'authToken' || e.key === 'user') {
+    window.addEventListener("storage", (e) => {
+      if (e.key === "authToken" || e.key === "user") {
         updateMenu();
       }
     });

@@ -22,7 +22,7 @@ export async function registerUser(userData) {
   }
 }
 
-// Nueva función para login
+// Función para login
 export async function loginUser(credentials) {
   try {
     const response = await fetch(`${API_URL}/login`, {
@@ -45,7 +45,7 @@ export async function loginUser(credentials) {
   }
 }
 
-// Función para verificar sesión (opcional, para validar token)
+// Función para verificar sesión
 export async function validateSession(token) {
   try {
     const response = await fetch(`${API_URL}/me`, {
@@ -60,6 +60,53 @@ export async function validateSession(token) {
     
     if (!response.ok) {
       throw new Error(data.message || 'Error en la validación de sesión');
+    }
+    
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Nueva función para buscar configuración
+export async function searchConfiguration(configData) {
+  try {
+    const response = await fetch(`${API_URL}/configurator/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(configData),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error en la búsqueda de configuración');
+    }
+    
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Nueva función para crear pedido
+export async function createOrder(orderData, token) {
+  try {
+    const response = await fetch(`${API_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al crear el pedido');
     }
     
     return data;
