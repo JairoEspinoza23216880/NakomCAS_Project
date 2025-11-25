@@ -5,6 +5,11 @@
 <div class="p-6 bg-white rounded-lg shadow-md">
   <h2 class="text-2xl font-semibold mb-4">Administrar Pedidos</h2>
 
+  <!-- Mensaje de carga/error -->
+  <div id="mensaje-estado" class="mb-4 hidden">
+    <p id="texto-estado" class="text-center py-4"></p>
+  </div>
+
   <table class="w-full table-auto border-collapse">
     <thead>
       <tr class="bg-gray-200">
@@ -39,118 +44,177 @@
   </table>
 </div>
 
-<!-- Modal -->
+<!-- Modal de Detalles -->
 <div
   id="modal"
   class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
 >
-  <div class="bg-white w-96 p-6 rounded-lg shadow-xl">
-    <h3 class="text-xl font-semibold mb-4">Detalles del Pedido</h3>
+  <div
+    class="bg-white w-full max-w-3xl p-6 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+  >
+    <h3 class="text-xl font-semibold mb-4">
+      Detalles del Pedido #<span id="m-id"></span>
+    </h3>
 
-    <p><strong>ID:</strong> <span id="m-id"></span></p>
-    <p><strong>Cliente:</strong> <span id="m-cliente"></span></p>
-    <p><strong>Email:</strong> <span id="m-email"></span></p>
-    <p><strong>Teléfono:</strong> <span id="m-phone"></span></p>
-    <p><strong>Fecha:</strong> <span id="m-fecha"></span></p>
-    <p><strong>Precio:</strong> <span id="m-total"></span></p>
-    <p><strong>Estado:</strong> <span id="m-estado"></span></p>
+    <!-- Información del Cliente -->
+    <div class="mb-6 p-4 bg-gray-50 rounded">
+      <h4 class="font-semibold mb-2">Información del Cliente</h4>
+      <p><strong>Nombre:</strong> <span id="m-cliente"></span></p>
+      <p><strong>Email:</strong> <span id="m-email"></span></p>
+      <p><strong>Teléfono:</strong> <span id="m-phone"></span></p>
+    </div>
+
+    <!-- Información del Pedido -->
+    <div class="mb-6 p-4 bg-gray-50 rounded">
+      <h4 class="font-semibold mb-2">Información del Pedido</h4>
+      <p><strong>Fecha:</strong> <span id="m-fecha"></span></p>
+      <p><strong>Estado:</strong> <span id="m-estado"></span></p>
+      <p><strong>Precio Total:</strong> <span id="m-total"></span></p>
+    </div>
+
+    <!-- Lista de Componentes -->
+    <div class="mb-6">
+      <h4 class="font-semibold mb-2">Componentes del Pedido</h4>
+      <div id="m-componentes" class="space-y-2">
+        <!-- Se llenará dinámicamente -->
+      </div>
+    </div>
 
     <button
       onclick="closeModal()"
-      class="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full"
+      class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
     >
       Cerrar
     </button>
   </div>
 </div>
-<!-- Modal de confirmación -->
-<div
-  id="modalEliminar"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
->
-  <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-    <h2 class="text-lg font-semibold mb-4">¿Eliminar pedido?</h2>
-    <p class="mb-4 text-sm text-gray-600">Esta acción no se puede deshacer.</p>
-    <div class="flex justify-end gap-3">
-      <button onclick="cerrarModal()" class="px-3 py-1 bg-gray-300 rounded"
-        >Cancelar</button
-      >
-      <button
-        id="btnConfirmarEliminar"
-        class="px-3 py-1 bg-red-500 text-white rounded">Eliminar</button
-      >
-    </div>
-  </div>
-</div>
 
 <script is:"client">
-  const pedidos = [
-    {
-      id: 12345,
-      cliente: "Pedrito Picapiedra",
-      email: "pedrito@example.com",
-      telefono: "+52 999 123 456",
-      fecha: "21/11/2024",
-      estado: "Esperando Pago",
-      total: "$1500.00",
-    },
-    {
-      id: 67890,
-      cliente: "Juan Pérez",
-      email: "juan@example.com",
-      telefono: "+52 999 777 888",
-      fecha: "20/11/2024",
-      estado: "Preparando Componentes",
-      total: "$2400.00",
-    },
-  ];
-
+  // Estados permitidos según el contrato API
   const statusOptions = [
+    "Pedido Recibido",
     "Esperando Pago",
-    "Pago Confirmado",
     "Preparando Componentes",
-    "Ensamblando PC",
-    "Listo para Envío",
-    "Enviado",
-    "Entregado",
+    "En Ensamblaje",
+    "Configuración y Pruebas",
+    "Listo para Entrega",
+    "Completado",
+    "Cancelado",
   ];
 
-  // ✔ TABLA PRINCIPAL (la tuya)
+  // Variable global para almacenar los pedidos
+  let pedidos = [];
+
+  // Obtener el token del localStorage
+  function getToken() {
+    return localStorage.getItem("authToken");
+  }
+
+  // Mostrar mensaje de estado
+  function mostrarMensaje(texto, tipo = "info") {
+    const mensajeDiv = document.getElementById("mensaje-estado");
+    const textoP = document.getElementById("texto-estado");
+
+    textoP.textContent = texto;
+    mensajeDiv.classList.remove("hidden");
+
+    if (tipo === "error") {
+      textoP.className = "text-center py-4 text-red-600";
+    } else if (tipo === "success") {
+      textoP.className = "text-center py-4 text-green-600";
+    } else {
+      textoP.className = "text-center py-4 text-gray-600";
+    }
+  }
+
+  function ocultarMensaje() {
+    document.getElementById("mensaje-estado").classList.add("hidden");
+  }
+
+  // Cargar pedidos desde la API
+  async function cargarPedidos() {
+    const token = getToken();
+
+    if (!token) {
+      mostrarMensaje(
+        "No se encontró token de autenticación. Por favor, inicia sesión.",
+        "error",
+      );
+      return;
+    }
+
+    mostrarMensaje("Cargando pedidos...", "info");
+
+    try {
+      const response = await fetch("http://localhost/api/admin/orders", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "No autorizado. Por favor, inicia sesión nuevamente.",
+          );
+        }
+        throw new Error(`Error al cargar pedidos: ${response.status}`);
+      }
+
+      pedidos = await response.json();
+      ocultarMensaje();
+      cargarTabla();
+    } catch (error) {
+      console.error("Error:", error);
+      mostrarMensaje(error.message, "error");
+    }
+  }
+
+  // Cargar tabla con los pedidos
   function cargarTabla() {
     const tbody = document.getElementById("tabla-pedidos");
     tbody.innerHTML = "";
 
+    if (pedidos.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-4 text-gray-500">
+            No hay pedidos registrados
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
     pedidos.forEach((p) => {
       const fila = document.createElement("tr");
+      fila.className = "hover:bg-gray-50";
 
       fila.innerHTML = `
         <td class="pr-12 py-3 text-right">${p.id}</td>
-        <td class="pr-12 py-3 text-right">${p.cliente}</td>
-        <td class="pr-12 py-3 text-right">${p.fecha}</td>
+        <td class="pr-12 py-3 text-right">${p.client_name}</td>
+        <td class="pr-12 py-3 text-right">${formatearFecha(p.date)}</td>
 
         <td class="pr-12 py-3 text-right">
-          <select onchange="ActualizarEstado(${p.id}, this.value)"
-            class="border rounded px-2 py-1">
+          <select onchange="actualizarEstado(${p.id}, this.value)"
+            class="border rounded px-2 py-1 text-sm">
             ${statusOptions
               .map(
                 (s) =>
-                  `<option value="${s}" ${s === p.estado ? "selected" : ""}>${s}</option>`
+                  `<option value="${s}" ${s === p.status ? "selected" : ""}>${s}</option>`,
               )
               .join("")}
           </select>
         </td>
 
-        <td class="pr-12 py-3 text-right">${p.total}</td>
+        <td class="pr-12 py-3 text-right">$${p.total_price.toFixed(2)}</td>
 
         <td class="pr-12 py-3 text-right">
           <button onclick='verDetalles(${p.id})'
-            class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">
+            class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm">
             Ver Detalles
-          </button>
-
-          <button onclick='confirmarEliminar(${p.id})'
-            class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">
-            Eliminar
           </button>
         </td>
       `;
@@ -159,61 +223,152 @@
     });
   }
 
-  // ✔ Modal detalles
-  function verDetalles(id) {
-    const p = pedidos.find((x) => x.id == id);
+  // Formatear fecha
+  function formatearFecha(fechaStr) {
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleString("es-MX", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
-    document.getElementById("m-id").textContent = p.id;
-    document.getElementById("m-cliente").textContent = p.cliente;
-    document.getElementById("m-email").textContent = p.email;
-    document.getElementById("m-phone").textContent = p.telefono;
-    document.getElementById("m-fecha").textContent = p.fecha;
-    document.getElementById("m-total").textContent = p.total;
-    document.getElementById("m-estado").textContent = p.estado;
+  // Ver detalles del pedido
+  async function verDetalles(id) {
+    const token = getToken();
+
+    if (!token) {
+      alert("No se encontró token de autenticación.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost/api/admin/orders/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al cargar detalles: ${response.status}`);
+      }
+
+      const pedido = await response.json();
+      mostrarModalDetalles(pedido);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al cargar los detalles del pedido: " + error.message);
+    }
+  }
+
+  // Mostrar modal con detalles
+  function mostrarModalDetalles(pedido) {
+    document.getElementById("m-id").textContent = pedido.id;
+    document.getElementById("m-cliente").textContent =
+      `${pedido.client_info.name} ${pedido.client_info.lastname}`;
+    document.getElementById("m-email").textContent = pedido.client_info.email;
+    document.getElementById("m-phone").textContent = pedido.client_info.phone;
+    document.getElementById("m-fecha").textContent = formatearFecha(
+      pedido.created_at,
+    );
+    document.getElementById("m-total").textContent =
+      `$${pedido.financials.total_price.toFixed(2)}`;
+    document.getElementById("m-estado").textContent = pedido.status;
+
+    // Cargar componentes
+    const componentesDiv = document.getElementById("m-componentes");
+    componentesDiv.innerHTML = "";
+
+    if (pedido.components && pedido.components.length > 0) {
+      const tabla = document.createElement("table");
+      tabla.className = "w-full border-collapse border border-gray-300";
+      tabla.innerHTML = `
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="border border-gray-300 px-4 py-2 text-left">Tipo</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
+            <th class="border border-gray-300 px-4 py-2 text-center">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pedido.components
+            .map(
+              (comp) => `
+            <tr>
+              <td class="border border-gray-300 px-4 py-2">${comp.type}</td>
+              <td class="border border-gray-300 px-4 py-2">${comp.name}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">${comp.quantity}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      `;
+      componentesDiv.appendChild(tabla);
+    } else {
+      componentesDiv.innerHTML =
+        '<p class="text-gray-500">No hay componentes registrados</p>';
+    }
 
     document.getElementById("modal").classList.remove("hidden");
   }
 
+  // Cerrar modal
   function closeModal() {
     document.getElementById("modal").classList.add("hidden");
   }
 
-  // ✔ Actualizar estado
-  function ActualizarEstado(id, nuevoEstado) {
-    const pedido = pedidos.find((p) => p.id === id);
-    if (pedido) {
-      pedido.estado = nuevoEstado;
-      cargarTabla();
+  // Actualizar estado del pedido
+  async function actualizarEstado(id, nuevoEstado) {
+    const token = getToken();
+
+    if (!token) {
+      alert("No se encontró token de autenticación.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost/api/admin/orders/${id}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: nuevoEstado }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error al actualizar estado: ${response.status}`);
+      }
+
+      const resultado = await response.json();
+
+      // Actualizar el estado local
+      const pedido = pedidos.find((p) => p.id === id);
+      if (pedido) {
+        pedido.status = nuevoEstado;
+      }
+
+      mostrarMensaje(
+        resultado.message || "Estado actualizado correctamente",
+        "success",
+      );
+      setTimeout(() => ocultarMensaje(), 3000);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al actualizar el estado: " + error.message);
+      // Recargar la tabla para restaurar el estado anterior
+      cargarPedidos();
     }
   }
 
-  // ✔ Modal eliminar
-  let idAEliminar = null;
-
-  function confirmarEliminar(id) {
-    idAEliminar = id;
-    document.getElementById("modalEliminar").classList.remove("hidden");
-  }
-
-  function cerrarModal() {
-    idAEliminar = null;
-    document.getElementById("modalEliminar").classList.add("hidden");
-  }
-
-  document.getElementById("btnConfirmarEliminar").onclick = () => {
-    if (idAEliminar !== null) eliminarPedido(idAEliminar);
-    cerrarModal();
-  };
-
-  // ✔ Eliminar pedido
-  function eliminarPedido(id) {
-    const index = pedidos.findIndex((p) => p.id === id);
-    if (index !== -1) {
-      pedidos.splice(index, 1);
-      cargarTabla();
-    }
-  }
-
-  // 🔥 Inicializa
-  cargarTabla();
+  // Inicializar al cargar la página
+  cargarPedidos();
 </script>

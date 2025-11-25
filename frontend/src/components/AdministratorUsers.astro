@@ -2,52 +2,52 @@
 
 ---
 
-<!-- Pagina de administrador de Usuarios -->
- <!-- Solo usuarios de tipo Vendedor deben entrar -->
-<div
-  id="admin-usuarios"
-  class="p-6 bg-white rounded-lg shadow-md"
-  data-api-base="../api/usuarios"
->
+<!-- Página de administrador de Usuarios --><!-- Solo usuarios de tipo Vendedor deben entrar -->
+<div id="admin-usuarios" class="p-6 bg-white rounded-lg shadow-md">
   <h2 class="text-2xl font-semibold mb-4">Administrar Usuarios</h2>
+
+  <!-- Mensaje de estado -->
+  <div id="mensaje-estado" class="mb-4 hidden">
+    <p id="texto-estado" class="text-center py-4"></p>
+  </div>
 
   <table class="w-full table-auto border-collapse">
     <thead>
       <tr class="bg-gray-200">
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >ID</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Nombre</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Apellido</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
-          >Correo Electrónico</th
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Email</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
-          >Telefóno</th
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Teléfono</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Rol</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Estado</th
         >
-        <!-- Estado entre Activo e inactivo 
-                                                                Esto impide que el usuario inicie sensión en el futuro. 
-                                                                No borra datos, por consecuencia, tambien debe haber 
-                                                                una forma de reactivarlo.-->
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider text-left"
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Fecha Registro</th
+        >
+        <th
+          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Acciones</th
         >
       </tr>
@@ -56,15 +56,17 @@
       <!-- Filas generadas dinámicamente -->
     </tbody>
   </table>
-  <!-- Cración de Cliente de manera manual -->
+
+  <!-- Botón para crear nuevo usuario -->
   <div class="mt-6">
     <button
+      id="btn-crear-usuario"
       class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
     >
       Crear Nuevo Usuario
     </button>
-    <!-- El Rol solo se edita desde la base de datos directa -->
   </div>
+
   <!-- Modal para crear/editar usuario -->
   <div
     id="usuario-modal"
@@ -83,23 +85,26 @@
       <form id="usuario-form" class="p-4 space-y-3">
         <input type="hidden" name="id" />
         <div>
-          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          <label class="block text-sm font-medium text-gray-700">Nombre *</label
+          >
           <input
-            name="nombre"
+            name="name"
             class="mt-1 block w-full border rounded px-3 py-2"
             required
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Apellido</label
+          <label class="block text-sm font-medium text-gray-700"
+            >Apellido *</label
           >
           <input
-            name="apellido"
+            name="lastname"
             class="mt-1 block w-full border rounded px-3 py-2"
+            required
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <label class="block text-sm font-medium text-gray-700">Email *</label>
           <input
             name="email"
             type="email"
@@ -108,212 +113,278 @@
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Teléfono</label
+          <label class="block text-sm font-medium text-gray-700"
+            >Teléfono *</label
           >
           <input
-            name="telefono"
+            name="phone_number"
             class="mt-1 block w-full border rounded px-3 py-2"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Rol</label>
-          <input
-            name="rol"
-            class="mt-1 block w-full border rounded px-3 py-2"
+            required
           />
         </div>
         <div id="password-row">
           <label class="block text-sm font-medium text-gray-700"
-            >Contraseña</label
+            >Contraseña <span id="password-hint" class="text-xs text-gray-500"
+            ></span></label
           >
           <input
             name="password"
             type="password"
             class="mt-1 block w-full border rounded px-3 py-2"
+            placeholder="Dejar en blanco para mantener la actual"
           />
         </div>
         <div class="flex justify-end gap-2">
           <button
             type="button"
             id="modal-cancel"
-            class="px-4 py-2 rounded border">Cancelar</button
+            class="px-4 py-2 rounded border hover:bg-gray-100">Cancelar</button
           >
           <button
             type="submit"
             id="modal-save"
-            class="px-4 py-2 rounded bg-blue-600 text-white">Guardar</button
+            class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            >Guardar</button
           >
         </div>
       </form>
     </div>
   </div>
-  <script>
-    // Lee la base de la API desde el atributo data-api-base del contenedor
-    function getApiBase() {
-      const container = document.getElementById("admin-usuarios");
-      return (
-        (container && container.dataset && container.dataset.apiBase) ||
-        "/api/usuarios"
-      );
+
+  <script is:inline>
+    // Variable global para almacenar usuarios
+    let usuarios = [];
+
+    // Obtener el token del localStorage
+    function getToken() {
+      return localStorage.getItem("authToken");
     }
 
-    // Normaliza distintos esquemas que pueda devolver un backend Java
-    function mapUserFromApi(u) {
-      return {
-        id: u.id ?? u.userId ?? u.uid ?? null,
-        nombre: u.nombre ?? u.firstName ?? u.name ?? "",
-        apellido: u.apellido ?? u.lastName ?? "",
-        email: u.email ?? u.emailAddress ?? "",
-        telefono: u.telefono ?? u.phone ?? u.telefonoMovil ?? "",
-        rol: u.rol ?? u.role ?? u.tipo ?? "",
-        activo: (u.activo ?? u.active ?? u.enabled) === false ? false : true,
-      };
-    }
+    // Mostrar mensaje de estado
+    function mostrarMensaje(texto, tipo = "info") {
+      const mensajeDiv = document.getElementById("mensaje-estado");
+      const textoP = document.getElementById("texto-estado");
 
-    async function fetchUsuarios() {
-      const apiBase = getApiBase();
-      try {
-        const res = await fetch(apiBase);
-        if (!res.ok) throw new Error("Error al obtener usuarios");
-        const data = await res.json();
-        // data puede ser un objeto con lista en `data` o directamente un array
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-            ? data.data
-            : [];
-        return list.map(mapUserFromApi);
-      } catch (err) {
-        console.error("fetchUsuarios:", err);
-        return null;
+      textoP.textContent = texto;
+      mensajeDiv.classList.remove("hidden");
+
+      if (tipo === "error") {
+        textoP.className = "text-center py-4 text-red-600";
+      } else if (tipo === "success") {
+        textoP.className = "text-center py-4 text-green-600";
+      } else {
+        textoP.className = "text-center py-4 text-gray-600";
       }
     }
 
-    function renderUsuarios(usuarios) {
-      const tbody = document.querySelector("#tabla-usuarios");
+    function ocultarMensaje() {
+      document.getElementById("mensaje-estado").classList.add("hidden");
+    }
+
+    // Cargar usuarios desde la API
+    async function fetchUsuarios() {
+      const token = getToken();
+
+      if (!token) {
+        mostrarMensaje(
+          "No se encontró token de autenticación. Por favor, inicia sesión.",
+          "error",
+        );
+        return;
+      }
+
+      mostrarMensaje("Cargando usuarios...", "info");
+
+      try {
+        const response = await fetch("http://localhost/api/admin/users", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error(
+              "No autorizado. Por favor, inicia sesión nuevamente.",
+            );
+          }
+          throw new Error(`Error al cargar usuarios: ${response.status}`);
+        }
+
+        usuarios = await response.json();
+        ocultarMensaje();
+        renderUsuarios();
+      } catch (error) {
+        console.error("Error:", error);
+        mostrarMensaje(error.message, "error");
+      }
+    }
+
+    // Renderizar tabla de usuarios
+    function renderUsuarios() {
+      const tbody = document.getElementById("tabla-usuarios");
       tbody.innerHTML = "";
 
-      if (!usuarios || usuarios.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-gray-500">No hay usuarios disponibles</td></tr>`;
+      if (usuarios.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-4 text-center text-gray-500">
+              No hay usuarios registrados
+            </td>
+          </tr>
+        `;
         return;
       }
 
       usuarios.forEach((u) => {
-        const estado = u.activo === false ? "Inactivo" : "Activo";
-        tbody.innerHTML += `
-          <tr>
-            <td class="pr-12 py-3 text-xs text-gray-700">${u.id ?? ""}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">${u.nombre}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">${u.apellido}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700 email-lower">${u.email}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">${u.telefono}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">${u.rol}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">${estado}</td>
-            <td class="pr-12 py-3 text-xs text-gray-700">
-              <button data-id="${u.id}" class="editar-btn bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">Editar</button>
-              <button data-id="${u.id}" class="eliminar-btn bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Eliminar</button>
-            </td>
-          </tr>
+        const fila = document.createElement("tr");
+        fila.className = "hover:bg-gray-50";
+
+        const estadoClass =
+          u.status === "Activo" ? "text-green-600" : "text-red-600";
+        const botonEstado =
+          u.status === "Activo"
+            ? `<button onclick="cambiarEstado(${u.id}, 'Inactivo')" class="bg-orange-500 text-white px-3 py-1 rounded-lg hover:bg-orange-600 text-sm">Desactivar</button>`
+            : `<button onclick="cambiarEstado(${u.id}, 'Activo')" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm">Activar</button>`;
+
+        fila.innerHTML = `
+          <td class="px-4 py-3 text-sm text-gray-700">${u.id}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${u.name}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${u.lastname}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${u.email}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${u.phone_number}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${u.role}</td>
+          <td class="px-4 py-3 text-sm font-semibold ${estadoClass}">${u.status}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${formatearFecha(u.register_date)}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <button onclick="editarUsuario(${u.id})" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm mr-2">Editar</button>
+            ${botonEstado}
+          </td>
         `;
+
+        tbody.appendChild(fila);
       });
-
-      // Añadir listeners (delegación simple)
-      document.querySelectorAll(".editar-btn").forEach((btn) =>
-        btn.addEventListener("click", (e) => {
-          const id = e.currentTarget.dataset.id;
-          editarUsuario(Number(id));
-        })
-      );
-      document.querySelectorAll(".eliminar-btn").forEach((btn) =>
-        btn.addEventListener("click", (e) => {
-          const id = e.currentTarget.dataset.id;
-          eliminarUsuario(Number(id));
-        })
-      );
     }
 
-    async function cargarTabla() {
-      const usuarios = await fetchUsuarios();
-      if (usuarios === null) {
-        // Mostrar ejemplo local si la API no responde
-        renderUsuarios([
-          {
-            id: 1,
-            nombre: "Pedro",
-            apellido: "Picapiedras",
-            email: "pedrito@picapiedras.com",
-            telefono: "555-1234",
-            rol: "Vendedor",
-            activo: true,
-          },
-        ]);
-        return;
-      }
-      renderUsuarios(usuarios);
+    // Formatear fecha
+    function formatearFecha(fechaStr) {
+      if (!fechaStr) return "N/A";
+      const fecha = new Date(fechaStr);
+      return fecha.toLocaleDateString("es-MX");
     }
 
-    // Abrir modal en modo editar y prefilar datos
-    async function editarUsuario(id) {
-      const usuarios = await fetchUsuarios();
-      if (!usuarios) return alert("No se pudo obtener usuario");
-      const user = usuarios.find((u) => Number(u.id) === Number(id));
-      if (!user) return alert("Usuario no encontrado");
-      openModal("Editar Usuario", user);
-    }
-
-    async function eliminarUsuario(id) {
-      const apiBase = getApiBase();
-      if (!confirm("¿Seguro que deseas desactivar este usuario?")) return;
-      try {
-        const res = await fetch(`${apiBase}/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ activo: false }),
-        });
-        if (!res.ok) throw new Error("Error al desactivar");
-        await cargarTabla();
-        alert("Usuario desactivado correctamente");
-      } catch (err) {
-        console.error(err);
-        alert("Error al eliminar/desactivar usuario");
-      }
-    }
-
-    // Abrir modal en modo crear
+    // Abrir modal para crear usuario
     function crearUsuario() {
-      openModal("Crear Usuario");
-    }
-
-    // Modal helpers
-    function openModal(title, user = null) {
       const modal = document.getElementById("usuario-modal");
       const titleEl = document.getElementById("modal-title");
       const form = document.getElementById("usuario-form");
-      titleEl.textContent = title;
-      form.reset();
-      // Mostrar/ocultar campo password (en editar opcional)
       const passwordRow = document.getElementById("password-row");
-      if (user) {
-        form.id.value = user.id ?? "";
-        form.nombre.value = user.nombre ?? "";
-        form.apellido.value = user.apellido ?? "";
-        form.email.value = user.email ?? "";
-        form.telefono.value = user.telefono ?? "";
-        form.rol.value = user.rol ?? "";
-        // en editar no requerimos cambiar contraseña
-        if (passwordRow) passwordRow.style.display = "none";
-      } else {
-        form.id.value = "";
-        if (passwordRow) passwordRow.style.display = "";
-      }
+      const passwordInput = form.querySelector('[name="password"]');
+
+      titleEl.textContent = "Crear Usuario";
+      form.reset();
+      form.querySelector('[name="id"]').value = "";
+
+      // En modo crear, la contraseña es requerida
+      passwordInput.required = true;
+      passwordInput.placeholder = "";
+      document.getElementById("password-hint").textContent = "*";
+
       modal.classList.remove("hidden");
       modal.classList.add("flex");
     }
 
+    // Abrir modal para editar usuario
+    function editarUsuario(id) {
+      const usuario = usuarios.find((u) => u.id === id);
+      if (!usuario) {
+        alert("Usuario no encontrado");
+        return;
+      }
+
+      const modal = document.getElementById("usuario-modal");
+      const titleEl = document.getElementById("modal-title");
+      const form = document.getElementById("usuario-form");
+      const passwordInput = form.querySelector('[name="password"]');
+
+      titleEl.textContent = "Editar Usuario";
+      form.reset();
+
+      form.querySelector('[name="id"]').value = usuario.id;
+      form.querySelector('[name="name"]').value = usuario.name;
+      form.querySelector('[name="lastname"]').value = usuario.lastname;
+      form.querySelector('[name="email"]').value = usuario.email;
+      form.querySelector('[name="phone_number"]').value = usuario.phone_number;
+
+      // En modo editar, la contraseña es opcional
+      passwordInput.required = false;
+      passwordInput.placeholder = "Dejar en blanco para mantener la actual";
+      document.getElementById("password-hint").textContent = "(opcional)";
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    // Cerrar modal
     function closeModal() {
       const modal = document.getElementById("usuario-modal");
       modal.classList.remove("flex");
       modal.classList.add("hidden");
+    }
+
+    // Cambiar estado del usuario (Activar/Desactivar)
+    async function cambiarEstado(id, nuevoEstado) {
+      const token = getToken();
+
+      if (!token) {
+        alert("No se encontró token de autenticación.");
+        return;
+      }
+
+      const mensaje =
+        nuevoEstado === "Inactivo"
+          ? "¿Estás seguro de que quieres bloquear el acceso a este usuario?"
+          : "¿Estás seguro de que quieres reactivar este usuario?";
+
+      if (!confirm(mensaje)) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost/api/admin/users/${id}/status`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: nuevoEstado }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error al cambiar estado: ${response.status}`);
+        }
+
+        const resultado = await response.json();
+
+        // Actualizar el estado local
+        const usuario = usuarios.find((u) => u.id === id);
+        if (usuario) {
+          usuario.status = nuevoEstado;
+        }
+
+        renderUsuarios();
+        mostrarMensaje(
+          resultado.message || "Estado actualizado correctamente",
+          "success",
+        );
+        setTimeout(() => ocultarMensaje(), 3000);
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error al cambiar el estado: " + error.message);
+      }
     }
 
     // Manejar submit del formulario
@@ -321,54 +392,92 @@
       const form = document.getElementById("usuario-form");
       const btnClose = document.getElementById("modal-close");
       const btnCancel = document.getElementById("modal-cancel");
-      const containerBtnCrear = document.querySelector(".mt-6 button");
-      if (containerBtnCrear)
-        containerBtnCrear.addEventListener("click", crearUsuario);
-      if (btnClose)
+      const btnCrear = document.getElementById("btn-crear-usuario");
+
+      if (btnCrear) {
+        btnCrear.addEventListener("click", crearUsuario);
+      }
+
+      if (btnClose) {
         btnClose.addEventListener("click", (e) => {
           e.preventDefault();
           closeModal();
         });
-      if (btnCancel)
+      }
+
+      if (btnCancel) {
         btnCancel.addEventListener("click", (e) => {
           e.preventDefault();
           closeModal();
         });
+      }
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const apiBase = getApiBase();
-        const fd = new FormData(form);
-        const payload = Object.fromEntries(fd.entries());
-        const id = payload.id;
-        // Eliminar id del payload para POST
-        if (id === "" || id === "undefined" || id == null) delete payload.id;
-        // Si password vacío, eliminar para no sobrescribir
-        if (!payload.password) delete payload.password;
+        const token = getToken();
+
+        if (!token) {
+          alert("No se encontró token de autenticación.");
+          return;
+        }
+
+        const formData = new FormData(form);
+        const payload = {};
+
+        // Construir payload según el contrato API
+        const id = formData.get("id");
+        payload.name = formData.get("name");
+        payload.lastname = formData.get("lastname");
+        payload.email = formData.get("email");
+        payload.phone_number = formData.get("phone_number");
+
+        // Solo incluir password si tiene valor
+        const password = formData.get("password");
+        if (password && password.trim() !== "") {
+          payload.password = password;
+        }
 
         try {
           const method = id ? "PUT" : "POST";
-          const url = id ? `${apiBase}/${id}` : apiBase;
-          const res = await fetch(url, {
+          const url = id
+            ? `http://localhost/api/admin/users/${id}`
+            : "http://localhost/api/admin/users";
+
+          const response = await fetch(url, {
             method,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify(payload),
           });
-          if (!res.ok) throw new Error("Error en la operación");
-          await cargarTabla();
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Error ${response.status}`);
+          }
+
+          const resultado = await response.json();
+
           closeModal();
-          alert(id ? "Usuario actualizado" : "Usuario creado");
-        } catch (err) {
-          console.error("form submit:", err);
-          alert("Error al guardar usuario");
+          await fetchUsuarios();
+
+          mostrarMensaje(
+            resultado.message ||
+              (id
+                ? "Usuario actualizado correctamente"
+                : "Usuario creado correctamente"),
+            "success",
+          );
+          setTimeout(() => ocultarMensaje(), 3000);
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error al guardar usuario: " + error.message);
         }
       });
-    });
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const btnCrear = document.querySelector(".mt-6 button");
-      if (btnCrear) btnCrear.addEventListener("click", crearUsuario);
-      cargarTabla();
+      // Cargar usuarios al iniciar
+      fetchUsuarios();
     });
   </script>
 </div>

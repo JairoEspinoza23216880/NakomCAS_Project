@@ -1,126 +1,126 @@
 ---
 // Verificar autenticación en el servidor (solo para el renderizado inicial)
 const isAuthenticated = () => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('authToken');
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("authToken");
     return !!token;
   }
   return false;
 };
 
 // Si estamos en el cliente, redirigir si no está autenticado
-if (typeof window !== 'undefined') {
-  const token = localStorage.getItem('authToken');
+if (typeof window !== "undefined") {
+  const token = localStorage.getItem("authToken");
   if (!token) {
-    window.location.href = '/Login';
+    window.location.href = "/Login";
   }
 }
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mis Pedidos - Nakom CAS</title>
-</head>
-<body>
-  <!-- Contenido temporal mientras se verifica autenticación -->
-  <div id="loading" class="flex justify-center items-center h-screen">
-    <p>Verificando autenticación...</p>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Pedidos - Nakom CAS</title>
+  </head>
+  <body>
+    <!-- Contenido temporal mientras se verifica autenticación -->
+    <div id="loading" class="flex justify-center items-center h-screen">
+      <p>Verificando autenticación...</p>
+    </div>
 
-  <div id="content" class="hidden">
-    <!-- Aquí va tu contenido original de pedidos -->
-    <div class="w-full flex flex-col gap-6" id="ordenesContainer"></div>
-  </div>
+    <div id="content" class="hidden">
+      <!-- Aquí va tu contenido original de pedidos -->
+      <div class="w-full flex flex-col gap-6" id="ordenesContainer"></div>
+    </div>
 
-  <script>
-    (function() {
-      // Verificar autenticación al cargar la página
-      const token = localStorage.getItem('authToken');
-      console.log('Token en pedidos:', token); // Para debugging
-      
-      if (!token) {
-        // Si no hay token, redirigir a login
-        window.location.href = '/Login';
-        return;
-      }
+    <script>
+      (function () {
+        // Verificar autenticación al cargar la página
+        const token = localStorage.getItem("authToken");
+        console.log("Token en pedidos:", token); // Para debugging
 
-      // Si hay token, mostrar contenido y continuar con la lógica
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('content').classList.remove('hidden');
-
-      // Tus datos de pedidos (deberías obtenerlos de tu backend en lugar de estar quemados)
-      const pedidos = [
-        {
-          id: "0015",
-          fecha: "21-11-2025",
-          nombrePC: "Gamer Pro X1",
-          precio: 25999,
-          estado: "Preparando Componentes",
-          componentes: [
-            "CPU: Ryzen 7 5800X",
-            "GPU: RTX 4070",
-            "RAM: 16GB DDR4",
-            "Almacenamiento: SSD 1TB NVMe",
-            "Placa Madre: B550 Steel Legend",
-            "Fuente: 750W 80+ Gold",
-          ],
-        },
-        {
-          id: "0014",
-          fecha: "15-11-2025",
-          nombrePC: "Ofimática Premium",
-          precio: 12999,
-          estado: "En Ensamblaje",
-          componentes: [
-            "CPU: Intel i5 12400",
-            "GPU: Integrada UHD",
-            "RAM: 16GB DDR4",
-            "Almacenamiento: SSD 512GB",
-            "Placa Madre: H610M",
-            "Fuente: 500W 80+ Bronze"
-          ]
-        },
-        {
-          id: "0013",
-          fecha: "10-11-2025",
-          nombrePC: "Estación de Trabajo X2",
-          precio: 34999,
-          estado: "Envío en Proceso",
-          componentes: [
-            "CPU: Ryzen 9 5950X",
-            "GPU: RTX 4090",
-            "RAM: 64GB DDR4",
-            "Almacenamiento: SSD 2TB NVMe + HDD 4TB",
-            "Placa Madre: X570 Taichi",
-            "Fuente: 1000W 80+ Platinum"
-          ]
+        if (!token) {
+          // Si no hay token, redirigir a login
+          window.location.href = "/Login";
+          return;
         }
-      ];
 
-      let modalVisible = false;
-      let pedidoSeleccionado = null;
-      const container = document.getElementById("ordenesContainer");
+        // Si hay token, mostrar contenido y continuar con la lógica
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("content").classList.remove("hidden");
 
-      function abrirModal(pedido) {
-        modalVisible = true;
-        pedidoSeleccionado = pedido;
-        renderizar();
-      }
+        // Tus datos de pedidos (deberías obtenerlos de tu backend en lugar de estar quemados)
+        const pedidos = [
+          {
+            id: "0015",
+            fecha: "21-11-2025",
+            nombrePC: "Gamer Pro X1",
+            precio: 25999,
+            estado: "Preparando Componentes",
+            componentes: [
+              "CPU: Ryzen 7 5800X",
+              "GPU: RTX 4070",
+              "RAM: 16GB DDR4",
+              "Almacenamiento: SSD 1TB NVMe",
+              "Placa Madre: B550 Steel Legend",
+              "Fuente: 750W 80+ Gold",
+            ],
+          },
+          {
+            id: "0014",
+            fecha: "15-11-2025",
+            nombrePC: "Ofimática Premium",
+            precio: 12999,
+            estado: "En Ensamblaje",
+            componentes: [
+              "CPU: Intel i5 12400",
+              "GPU: Integrada UHD",
+              "RAM: 16GB DDR4",
+              "Almacenamiento: SSD 512GB",
+              "Placa Madre: H610M",
+              "Fuente: 500W 80+ Bronze",
+            ],
+          },
+          {
+            id: "0013",
+            fecha: "10-11-2025",
+            nombrePC: "Estación de Trabajo X2",
+            precio: 34999,
+            estado: "Envío en Proceso",
+            componentes: [
+              "CPU: Ryzen 9 5950X",
+              "GPU: RTX 4090",
+              "RAM: 64GB DDR4",
+              "Almacenamiento: SSD 2TB NVMe + HDD 4TB",
+              "Placa Madre: X570 Taichi",
+              "Fuente: 1000W 80+ Platinum",
+            ],
+          },
+        ];
 
-      function cerrarModal() {
-        modalVisible = false;
-        pedidoSeleccionado = null;
-        renderizar();
-      }
+        let modalVisible = false;
+        let pedidoSeleccionado = null;
+        const container = document.getElementById("ordenesContainer");
 
-      function renderizar() {
-        if (!container) return;
+        function abrirModal(pedido) {
+          modalVisible = true;
+          pedidoSeleccionado = pedido;
+          renderizar();
+        }
 
-        if (pedidos.length === 0) {
-          container.innerHTML = `
+        function cerrarModal() {
+          modalVisible = false;
+          pedidoSeleccionado = null;
+          renderizar();
+        }
+
+        function renderizar() {
+          if (!container) return;
+
+          if (pedidos.length === 0) {
+            container.innerHTML = `
             <div class="text-center text-gray-500">
               <p class="text-xl font-semibold">Aún no has realizado ningún pedido.</p>
               <a href="/Configuration" class="text-blue-600 underline hover:text-blue-800">
@@ -128,16 +128,18 @@ if (typeof window !== 'undefined') {
               </a>
             </div>
           `;
-          return;
-        }
+            return;
+          }
 
-        let html = `
+          let html = `
         <section class="w-full max-w-2xl mx-auto flex flex-col gap-4">
         <h1 class="text-3xl font-extrabold text-center text-gray-800 mt-3">
           Mis Pedidos
         </h1>
 
-        ${pedidos.map((pedido) => `
+        ${pedidos
+          .map(
+            (pedido) => `
             <button
               class="cursor-pointer p-6 bg-white rounded-2xl shadow-md transition-transform duration-200 text-left pedido-btn w-full m-3"
               data-id="${pedido.id}">
@@ -151,14 +153,14 @@ if (typeof window !== 'undefined') {
                   Estado: <span class="text-blue-600">${pedido.estado}</span>
                 </p>
             </button>
-        `
+        `,
           )
           .join("")}
         </section>
         `;
 
-        if (modalVisible && pedidoSeleccionado) {
-          html += `
+          if (modalVisible && pedidoSeleccionado) {
+            html += `
             <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50 transition-opacity duration-300 ease-out ${modalVisible ? "opacity-100" : "opacity-0"}">
                 <div class="bg-white w-full max-w-lg rounded-2xl p-8 shadow-2xl relative transform transition-all duration-300 ease-out ${modalVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"}">
                     <h2 class="text-3xl font-extrabold mb-6 text-center text-gray-800">
@@ -186,41 +188,41 @@ if (typeof window !== 'undefined') {
                 </div>
             </div>
           `;
-        }
-        container.innerHTML = html;
+          }
+          container.innerHTML = html;
 
-        // Agregar event listeners después de renderizar
-        document.querySelectorAll(".pedido-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            const pedido = pedidos.find((p) => p.id === id);
-            if (pedido) abrirModal(pedido);
+          // Agregar event listeners después de renderizar
+          document.querySelectorAll(".pedido-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const id = btn.getAttribute("data-id");
+              const pedido = pedidos.find((p) => p.id === id);
+              if (pedido) abrirModal(pedido);
+            });
           });
+
+          const modalClose = document.querySelector(".modal-close");
+          if (modalClose) {
+            modalClose.addEventListener("click", cerrarModal);
+          }
+        }
+
+        // Inicializar la página
+        renderizar();
+
+        // Escuchar cambios en localStorage para detectar logout
+        window.addEventListener("storage", (e) => {
+          if (e.key === "authToken" && !e.newValue) {
+            // Token eliminado (logout), redirigir a login
+            window.location.href = "/Login";
+          }
         });
+      })();
+    </script>
 
-        const modalClose = document.querySelector(".modal-close");
-        if (modalClose) {
-          modalClose.addEventListener("click", cerrarModal);
-        }
+    <style>
+      button:focus {
+        outline: none;
       }
-
-      // Inicializar la página
-      renderizar();
-
-      // Escuchar cambios en localStorage para detectar logout
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'authToken' && !e.newValue) {
-          // Token eliminado (logout), redirigir a login
-          window.location.href = '/Login';
-        }
-      });
-    })();
-  </script>
-
-  <style>
-    button:focus {
-      outline: none;
-    }
-  </style>
-</body>
+    </style>
+  </body>
 </html>
