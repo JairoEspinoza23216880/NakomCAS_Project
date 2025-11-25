@@ -88,7 +88,61 @@ return function (App $app) {
      * Objetivo: Obtener todos los componentes registrados
      */
     $app->get('/api/admin/components', function (Request $request, Response $response) {
-        // Obtener todos los componentes
+        try {
+            // 1. Autenticación y validación de rol administrador
+            $auth = authenticateAdmin($request);
+            if (!$auth['success']) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => $auth['message']
+                ]));
+                return $response->withStatus($auth['code'])
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            // 2. Obtener parámetros de filtro (opcional) y validar 'type'
+            $params = $request->getQueryParams();
+            $query = \App\Models\Component::with('componentType');
+            if (isset($params['type'])) {
+                if (!is_numeric($params['type'])) {
+                    $response->getBody()->write(json_encode([
+                        'success' => false,
+                        'message' => 'El parámetro "type" debe ser numérico.'
+                    ]));
+                    return $response->withStatus(400)
+                        ->withHeader('Content-Type', 'application/json');
+                }
+                $query->where('component_type_id', $params['type']);
+            }
+
+            // 3. Consulta de componentes con JOIN al tipo
+            $components = $query->get();
+
+            // 4. Formateo de la respuesta según el contrato del API
+            $result = $components->map(function ($component) {
+                return [
+                    'id' => $component->id,
+                    'name' => $component->name,
+                    'type_name' => $component->componentType ? $component->componentType->type_name : null,
+                    'price' => $component->price,
+                    'stock' => $component->stock,
+                    'tier' => $component->tier,
+                    'status' => $component->status
+                ];
+            })->toArray();
+
+            // 5. Envío de respuesta JSON (array, aunque esté vacío)
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            // 6. Manejo de errores internos con mensaje personalizado
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'No se pudo obtener el inventario. Intenta nuevamente o contacta al administrador.'
+            ]));
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json');
+        }
     })->add(new JwtMiddleware());
 
 
