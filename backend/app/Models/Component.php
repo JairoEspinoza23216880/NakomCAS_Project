@@ -26,6 +26,12 @@ class Component extends Model
 
 
     // RELACIONES
+    // Un Componente pertenece a un Tipo
+    public function componentType()
+    {
+        return $this->belongsTo(ComponentType::class, 'component_type_id');
+    }
+    
     // Varios Componentes pertenecen a varias Órdenes
     public function orders()
     {

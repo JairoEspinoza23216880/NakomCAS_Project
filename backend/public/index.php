@@ -22,6 +22,29 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware(); // Middleware para parsear JSON automáticamente
 
 // ---------------------
+// --- CONFIGURAR CORS ---
+// ---------------------
+// IMPORTANTE: CORS debe configurarse ANTES de las rutas
+
+// Configurar CORS middleware
+$app->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+    
+    $response = $response
+        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:4321')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true');
+    
+    return $response;
+});
+
+// Manejar preflight OPTIONS
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+
+// ---------------------
 // --- RUTAS DEL API ---
 // ---------------------
 
@@ -32,8 +55,8 @@ $authRoutes($app);
 $configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
 $configRoutes($app);
 
-//$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
-//$adminRoutes($app);
+$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
+$adminRoutes($app);
 
 //$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
 //$ordersRoutes($app);
@@ -80,23 +103,6 @@ $app->get('/test-db', function (Request $request, Response $response, $args) {
 // Carga tus rutas de API modulares (¡Buena práctica!)
 // (Aún no lo hemos creado, pero aquí iría)
 // require __DIR__ . '/../app/Routes/api.php';
-
-// Configurar CORS middleware
-$app->add(function ($request, $handler) {
-    $response = $handler->handle($request);
-    
-    $response = $response
-        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:4321')
-        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    
-    return $response;
-});
-
-// Manejar preflight OPTIONS
-$app->options('/{routes:.+}', function ($request, $response, $args) {
-    return $response;
-});
 
 
 // ¡Corre la aplicación!
