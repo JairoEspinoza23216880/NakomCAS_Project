@@ -35,6 +35,12 @@ $configRoutes($app);
 $adminOrdersRoutes = require __DIR__ . '/../app/Routes/adminOrders.php';
 $adminOrdersRoutes($app);
 
+$adminComponentsRoutes = require __DIR__ . '/../app/Routes/adminComponents.php';
+$adminComponentsRoutes($app);
+
+$adminUsersRoutes = require __DIR__ . '/../app/Routes/adminUsers.php';
+$adminUsersRoutes($app);
+
 $ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
 $ordersRoutes($app);
 
