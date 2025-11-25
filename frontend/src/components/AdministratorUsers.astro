@@ -15,39 +15,39 @@
     <thead>
       <tr class="bg-gray-200">
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >ID</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Nombre</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Apellido</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Email</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Teléfono</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Rol</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Estado</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Fecha Registro</th
         >
         <th
-          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Acciones</th
         >
       </tr>
@@ -196,7 +196,7 @@
       mostrarMensaje("Cargando usuarios...", "info");
 
       try {
-        const response = await fetch("http://localhost/api/admin/users", {
+        const response = await fetch("http://localhost:8000/api/admin/users", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -250,15 +250,15 @@
             : `<button onclick="cambiarEstado(${u.id}, 'Activo')" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm">Activar</button>`;
 
         fila.innerHTML = `
-          <td class="px-4 py-3 text-sm text-gray-700">${u.id}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${u.name}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${u.lastname}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${u.email}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${u.phone_number}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${u.role}</td>
-          <td class="px-4 py-3 text-sm font-semibold ${estadoClass}">${u.status}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">${formatearFecha(u.register_date)}</td>
-          <td class="px-4 py-3 text-sm text-gray-700">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.name}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.lastname}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.email}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.phone_number}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.role}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold ${estadoClass}">${u.status}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatearFecha(u.register_date)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             <button onclick="editarUsuario(${u.id})" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm mr-2">Editar</button>
             ${botonEstado}
           </td>
@@ -352,7 +352,7 @@
 
       try {
         const response = await fetch(
-          `http://localhost/api/admin/users/${id}/status`,
+          `http://localhost:8000/api/admin/users/${id}/status`,
           {
             method: "PATCH",
             headers: {
@@ -440,8 +440,8 @@
         try {
           const method = id ? "PUT" : "POST";
           const url = id
-            ? `http://localhost/api/admin/users/${id}`
-            : "http://localhost/api/admin/users";
+            ? `http://localhost:8000/api/admin/users/${id}`
+            : "http://localhost:8000/api/admin/users";
 
           const response = await fetch(url, {
             method,

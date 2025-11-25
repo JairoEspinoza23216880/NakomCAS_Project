@@ -55,11 +55,22 @@ $authRoutes($app);
 $configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
 $configRoutes($app);
 
+<<<<<<< HEAD
 $adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
 $adminRoutes($app);
+=======
+$adminOrdersRoutes = require __DIR__ . '/../app/Routes/adminOrders.php';
+$adminOrdersRoutes($app);
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
 
-//$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
-//$ordersRoutes($app);
+$adminComponentsRoutes = require __DIR__ . '/../app/Routes/adminComponents.php';
+$adminComponentsRoutes($app);
+
+$adminUsersRoutes = require __DIR__ . '/../app/Routes/adminUsers.php';
+$adminUsersRoutes($app);
+
+$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
+$ordersRoutes($app);
 
 // -----------------------
 // --- RUTAS DE PRUEBA ---

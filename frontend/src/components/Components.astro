@@ -184,10 +184,17 @@ const TIPOS_COMPONENTES_FALLBACK = [
   const API_URL = "http://localhost:8000/api";
 
   async function getComponentTypes(token) {
+<<<<<<< HEAD
     const response = await fetch(`${API_URL}/admin/component-types`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+=======
+    const response = await fetch(${API_URL}/admin/component-types, {
+      method: "GET",
+      headers: {
+        Authorization: Bearer ${token},
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
         "Content-Type": "application/json",
       },
     });
@@ -196,10 +203,17 @@ const TIPOS_COMPONENTES_FALLBACK = [
   }
 
   async function getComponents(token) {
+<<<<<<< HEAD
     const response = await fetch(`${API_URL}/admin/components`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+=======
+    const response = await fetch(${API_URL}/admin/components, {
+      method: "GET",
+      headers: {
+        Authorization: Bearer ${token},
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
         "Content-Type": "application/json",
       },
     });
@@ -208,10 +222,17 @@ const TIPOS_COMPONENTES_FALLBACK = [
   }
 
   async function createComponent(componentData, token) {
+<<<<<<< HEAD
     const response = await fetch(`${API_URL}/admin/components`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+=======
+    const response = await fetch(${API_URL}/admin/components, {
+      method: "POST",
+      headers: {
+        Authorization: Bearer ${token},
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
         "Content-Type": "application/json",
       },
       body: JSON.stringify(componentData),
@@ -221,10 +242,17 @@ const TIPOS_COMPONENTES_FALLBACK = [
   }
 
   async function updateComponent(id, componentData, token) {
+<<<<<<< HEAD
     const response = await fetch(`${API_URL}/admin/components/${id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
+=======
+    const response = await fetch(${API_URL}/admin/components/${id}, {
+      method: "PUT",
+      headers: {
+        Authorization: Bearer ${token},
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
         "Content-Type": "application/json",
       },
       body: JSON.stringify(componentData),
@@ -234,10 +262,17 @@ const TIPOS_COMPONENTES_FALLBACK = [
   }
 
   async function toggleComponentStatus(id, status, token) {
+<<<<<<< HEAD
     const response = await fetch(`${API_URL}/admin/components/${id}/status`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
+=======
+    const response = await fetch(${API_URL}/admin/components/${id}/status, {
+      method: "PATCH",
+      headers: {
+        Authorization: Bearer ${token},
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ status }),
@@ -361,6 +396,7 @@ const TIPOS_COMPONENTES_FALLBACK = [
       row.insertCell().textContent = component.nombre;
       row.insertCell().textContent = component.tipo;
       row.insertCell().textContent = component.gama.toString();
+<<<<<<< HEAD
       row.insertCell().textContent = `$${component.precio.toFixed(2)}`;
       row.insertCell().textContent = component.stock.toString();
       const statusCell = row.insertCell();
@@ -369,6 +405,16 @@ const TIPOS_COMPONENTES_FALLBACK = [
       actionsCell.className =
         "px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2";
       actionsCell.innerHTML = `<button class="text-indigo-600 hover:text-indigo-900 edit-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>Editar</button><button class="${component.estado === "Activo" ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"} toggle-status-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>${component.estado === "Activo" ? "Desactivar" : "Reactivar"}</button>`;
+=======
+      row.insertCell().textContent = $${component.precio.toFixed(2)};
+      row.insertCell().textContent = component.stock.toString();
+      const statusCell = row.insertCell();
+      statusCell.innerHTML = <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${component.estado === "Activo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}">${component.estado}</span>;
+      const actionsCell = row.insertCell();
+      actionsCell.className =
+        "px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2";
+      actionsCell.innerHTML = <button class="text-indigo-600 hover:text-indigo-900 edit-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>Editar</button><button class="${component.estado === "Activo" ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"} toggle-status-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>${component.estado === "Activo" ? "Desactivar" : "Reactivar"}</button>;
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
     });
     document.querySelectorAll(".edit-btn").forEach((button) => {
       button.addEventListener("click", () =>
@@ -451,7 +497,11 @@ const TIPOS_COMPONENTES_FALLBACK = [
     if (stockEl && stockEl instanceof HTMLInputElement)
       stockEl.value = component.stock.toString();
     if (formTitle)
+<<<<<<< HEAD
       formTitle.textContent = `Editar Componente: ${component.nombre}`;
+=======
+      formTitle.textContent = Editar Componente: ${component.nombre};
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
     if (submitButton) submitButton.textContent = "Guardar Cambios";
     if (cancelButton) cancelButton.classList.remove("hidden");
     renderizar();
@@ -493,4 +543,8 @@ const TIPOS_COMPONENTES_FALLBACK = [
   }
 
   init();
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8

@@ -4,13 +4,15 @@
 
 <h1 class="text-3xl font-semibold text-gray-800 text-center mt-5 mb-8">
   Página de Administrador de PC's PreConfiguradas
-</h1> 
+</h1>
 
 <div class="p-6 bg-white rounded-lg shadow-md max-w-7xl mx-auto mb-8">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-semibold text-gray-800">Configuraciones de PC</h2>
-    <button onclick="openModal()"
-      class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+    <button
+      onclick="openModal()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+    >
       + Nueva Configuración
     </button>
   </div>
@@ -18,11 +20,26 @@
   <table class="w-full table-auto border-collapse" id="configTable">
     <thead>
       <tr class="bg-gray-200">
-        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Servicio</th>
-        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Componentes</th>
-        <th class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        <th
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >ID</th
+        >
+        <th
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Nombre</th
+        >
+        <th
+          class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Monto Servicio</th
+        >
+        <th
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Componentes</th
+        >
+        <th
+          class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >Acciones</th
+        >
       </tr>
     </thead>
 
@@ -149,11 +166,11 @@
 
       tbody.innerHTML += `
         <tr>
-          <td class="pr-12 py-3 text-right">${c.id}</td>
-          <td class="pr-12 py-3 text-right">${c.name}</td>
-          <td class="pr-12 py-3 text-right">$${c.serviceAmount}</td>
-          <td class="pr-12 py-3 text-right text-sm text-gray-600">${names}</td>
-          <td class="pr-12 py-3 text-right">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${c.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${c.name}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">$${c.serviceAmount}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${names}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <button class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600">Editar</button>
             <button onclick="deleteConfig('${c.id}')"
               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">
@@ -239,7 +256,7 @@
     const type = document.getElementById("typeFilter").value;
 
     filteredComponents = allComponents.filter(
-      (c) => c.name.toLowerCase().includes(text) && (!type || c.type === type)
+      (c) => c.name.toLowerCase().includes(text) && (!type || c.type === type),
     );
 
     renderAvailableComponents();

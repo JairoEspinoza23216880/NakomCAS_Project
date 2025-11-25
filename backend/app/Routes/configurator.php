@@ -31,19 +31,21 @@ use App\Models\DanielMapBooster;
 return function (App $app) {
 
     $app->post('/api/configurator/search', function (Request $request, Response $response) {
-        // Definir constante para super_category_id de gabinete
+
+        // 0. Definir constante para super_category_id de gabinete
         if (!defined('SUPER_CATEGORY_GABINET')) {
             define('SUPER_CATEGORY_GABINET', 3);
         }
+
 
         // 1. Obtener datos del body
         $body = $request->getParsedBody();
         $needs_boosters = $body['selected_needs_n_boosters'] ?? [];
         $personalization_ids = $body['selected_personalization_ids'] ?? [];
 
-        // Arrays para tiers
         $cpu_tiers = [];
         $gpu_tiers = [];
+        $ram_tiers = [];
         $ram_tiers = [];
 
         // Validar y filtrar IDs
@@ -55,6 +57,11 @@ return function (App $app) {
         }, $needs_boosters));
         $valid_personalization_ids = array_filter($personalization_ids, 'is_numeric');
 
+
+        // 2. Inicializar arrays para tiers
+        $cpu_tiers = [];
+        $gpu_tiers = [];
+        $ram_tiers = [];
         // Obtener needs y boosters en lote
         $needs = DanielMapNeed::whereIn('id', $valid_need_ids)->get()->keyBy('id');
         $boosters = DanielMapBooster::whereIn('id', $valid_booster_ids)->get()->keyBy('id');
@@ -64,6 +71,8 @@ return function (App $app) {
         $gpu_tiers = [];
         $ram_tiers = [];
 
+
+        // 3. Calcular tiers máximos considerando boosters
         foreach ($needs_boosters as $pair) {
             if (!is_array($pair) || count($pair) != 2) continue;
             $need_id = $pair[0];
@@ -104,7 +113,6 @@ return function (App $app) {
 
 
         // 6. Buscar kit estructural óptimo (menor precio, status Activo, y tier de gabinete si aplica)
-        // 6. Personalizaciones y gabinete (optimizado)
         $personalizations = [];
         $cabinet_tier = null;
         $personalization_objs = DanielMapPersonalization::whereIn('id', $valid_personalization_ids)->get();
@@ -206,6 +214,9 @@ return function (App $app) {
                 'personalization_components' => $personalizations
             ]
         ];
+
+
+        // 11. Enviar respuesta
         $response->getBody()->write(json_encode($data));
         return $response->withHeader('Content-Type', 'application/json');
     });

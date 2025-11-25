@@ -1,223 +1,203 @@
----
-const { selected = "" } = Astro.props;
-import Basic from "../components/ConfiguracionComponents/Basic.astro";
-import Gaming from "../components/ConfiguracionComponents/Gaming.astro";
-import Audiovisual from "../components/ConfiguracionComponents/Audiovisual.astro";
-import Workstation from "./ConfiguracionComponents/Workstation.astro";
----
+data-selected="{selected}" class="flex flex-col gap-6 my-auto" >
+<button
+  class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 boton-formulario"
+  data-form="basic"
+>
+  <img
+    src="../../public/img/Configuracion.png"
+    alt="Configuración básica"
+    class="opacity-60 transition-opacity duration-200"
+  />
+</button>
+<button
+  class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+  data-form="gaming"
+>
+  <img
+    src="../../public/img/Gaming.png"
+    alt="Gaming"
+    class="opacity-60 transition-opacity duration-200"
+  />
+</button>
+<button
+  class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+  data-form="monitor"
+>
+  <img
+    src="../../public/img/Audiovisual.png"
+    alt="Audiovisuales"
+    class="opacity-60 transition-opacity duration-200"
+  />
+</button>
+<button
+  class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+  data-form="dev"
+>
+  <img
+    src="../../public/img/Trabajo.png"
+    alt="Trabajo"
+    class="opacity-60 transition-opacity duration-200"
+  />
+</button>
 
-<div class="w-full flex gap-6 p-6 px-20 min-h-screen max-w-full mx-auto">
-  <!-- Sidebar para seleccionar el formulario -->
-  <aside
-    id="menu-botones"
-    data-selected={selected}
-    class="flex flex-col gap-6 my-auto"
-  >
-    <button
-      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 boton-formulario"
-      data-form="basic"
-    >
-      <img
-        src="../../public/img/Configuracion.png"
-        alt="Configuración básica"
-        class="opacity-60 transition-opacity duration-200"
-      />
-    </button>
-    <button
-      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
-      data-form="gaming"
-    >
-      <img
-        src="../../public/img/Gaming.png"
-        alt="Gaming"
-        class="opacity-60 transition-opacity duration-200"
-      />
-    </button>
-    <button
-      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
-      data-form="monitor"
-    >
-      <img
-        src="../../public/img/Audiovisual.png"
-        alt="Audiovisuales"
-        class="opacity-60 transition-opacity duration-200"
-      />
-    </button>
-    <button
-      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
-      data-form="dev"
-    >
-      <img
-        src="../../public/img/Trabajo.png"
-        alt="Trabajo"
-        class="opacity-60 transition-opacity duration-200"
-      />
-    </button>
-  </aside>
-
-  <!-- Main Container -->
-  <section class="flex-1 bg-white p-5 rounded-2xl shadow mx-5">
-    <div id="form-area" data-selected={selected}>
-      <!-- Cada formulario se renderiza server-side como un panel.
+<!-- Main Container -->
+<section class="flex-1 bg-white p-5 rounded-2xl shadow mx-5">
+  <div id="form-area" data-selected={selected}>
+    <!-- Cada formulario se renderiza server-side como un panel.
             El script cliente solo muestra/oculta los paneles por `data-form`.
             Así podemos incluir componentes Astro (ej: <Prueba/>) dentro del panel `dev`.-->
 
-      <div class="form-panel" data-form="basic">
-        <Basic />
-      </div>
-
-      <div class="form-panel hidden" data-form="gaming">
-        <Gaming />
-      </div>
-
-      <div class="form-panel hidden" data-form="monitor">
-        <Audiovisual />
-      </div>
-
-      <div class="form-panel hidden" data-form="dev">
-        <Workstation />
-      </div>
-    </div>
-  </section>
-
-  <section
-    class="flex-1 bg-white rounded-2xl p-5 shadow max-w-sm max-h-screen-sm mx-5 items-center my-auto"
-  >
-    <h2 class="text-center text-xl font-bold text-gray-800 mb-2">
-      Tu PC Recomendada
-    </h2>
-
-    <!-- Mensaje de estado -->
-    <div id="mensaje-estado" class="mb-4 hidden">
-      <p id="texto-estado" class="text-center py-2 text-sm"></p>
+    <div class="form-panel" data-form="basic">
+      <Basic />
     </div>
 
-    <div id="resumenConfiguracion" class="space-y-4">
+    <div class="form-panel hidden" data-form="gaming">
+      <Gaming />
+    </div>
+
+    <div class="form-panel hidden" data-form="monitor">
+      <Audiovisual />
+    </div>
+
+    <div class="form-panel hidden" data-form="dev">
+      <Workstation />
+    </div>
+  </div>
+</section>
+
+<section
+  class="flex-1 bg-white rounded-2xl p-5 shadow max-w-sm max-h-screen-sm mx-5 items-center my-auto"
+>
+  <h2 class="text-center text-xl font-bold text-gray-800 mb-2">
+    Tu PC Recomendada
+  </h2>
+
+  <!-- Mensaje de estado -->
+  <div id="mensaje-estado" class="mb-4 hidden">
+    <p id="texto-estado" class="text-center py-2 text-sm"></p>
+  </div>
+
+  <div id="resumenConfiguracion" class="space-y-4">
+    <div
+      id="placeholder-inicial"
+      class="flex flex-col items-center justify-center text-gray-500 py-20"
+    >
+      <svg
+        class="w-16 h-16 mb-4 text-gray-300"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+        ></path>
+      </svg>
+      <p class="mt-4 text-center text-sm">
+        Selecciona tus necesidades<br />para ver tu PC ideal
+      </p>
+    </div>
+
+    <!-- Contenedor de resultados (oculto inicialmente) -->
+    <div id="resultado-pc" class="hidden">
+      <!-- Precio Total -->
       <div
-        id="placeholder-inicial"
-        class="flex flex-col items-center justify-center text-gray-500 py-20"
+        class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg mb-4"
       >
-        <svg
-          class="w-16 h-16 mb-4 text-gray-300"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          ></path>
-        </svg>
-        <p class="mt-4 text-center text-sm">
-          Selecciona tus necesidades<br />para ver tu PC ideal
-        </p>
+        <p class="text-sm opacity-90">Precio Total</p>
+        <p id="precio-total" class="text-3xl font-bold">$0.00</p>
       </div>
 
-      <!-- Contenedor de resultados (oculto inicialmente) -->
-      <div id="resultado-pc" class="hidden">
-        <!-- Precio Total -->
-        <div
-          class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg mb-4"
-        >
-          <p class="text-sm opacity-90">Precio Total</p>
-          <p id="precio-total" class="text-3xl font-bold">$0.00</p>
-        </div>
-
-        <!-- Kit Funcional -->
-        <div class="mb-4">
-          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
-              ></path>
-            </svg>
-            Kit Funcional
-          </h3>
-          <div class="bg-gray-50 p-3 rounded-lg">
-            <p
-              id="functional-kit-name"
-              class="text-sm font-medium text-gray-800 mb-1"
-            >
-            </p>
-            <p id="functional-kit-price" class="text-xs text-gray-600 mb-2"></p>
-            <div
-              id="functional-components"
-              class="text-xs text-gray-600 space-y-1"
-            >
-            </div>
+      <!-- Kit Funcional -->
+      <div class="mb-4">
+        <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+            ></path>
+          </svg>
+          Kit Funcional
+        </h3>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p
+            id="functional-kit-name"
+            class="text-sm font-medium text-gray-800 mb-1"
+          >
+          </p>
+          <p id="functional-kit-price" class="text-xs text-gray-600 mb-2"></p>
+          <div
+            id="functional-components"
+            class="text-xs text-gray-600 space-y-1"
+          >
           </div>
         </div>
+      </div>
 
-        <!-- Kit Estructural -->
-        <div class="mb-4" id="structural-kit-container">
-          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"
-                clip-rule="evenodd"></path>
-            </svg>
-            Kit Estructural
-          </h3>
-          <div class="bg-gray-50 p-3 rounded-lg">
-            <p
-              id="structural-kit-name"
-              class="text-sm font-medium text-gray-800 mb-1"
-            >
-            </p>
-            <p id="structural-kit-price" class="text-xs text-gray-600 mb-2"></p>
-            <div
-              id="structural-components"
-              class="text-xs text-gray-600 space-y-1"
-            >
-            </div>
+      <!-- Kit Estructural -->
+      <div class="mb-4" id="structural-kit-container">
+        <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"
+              clip-rule="evenodd"></path>
+          </svg>
+          Kit Estructural
+        </h3>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p
+            id="structural-kit-name"
+            class="text-sm font-medium text-gray-800 mb-1"
+          >
+          </p>
+          <p id="structural-kit-price" class="text-xs text-gray-600 mb-2"></p>
+          <div
+            id="structural-components"
+            class="text-xs text-gray-600 space-y-1"
+          >
           </div>
         </div>
+      </div>
 
-        <!-- Personalizaciones -->
-        <div
-          class="mb-4"
-          id="personalizations-container"
-          style="display: none;"
-        >
-          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
-              ></path>
-            </svg>
-            Personalizaciones
-          </h3>
-          <div class="bg-gray-50 p-3 rounded-lg">
-            <div
-              id="personalization-components"
-              class="text-xs text-gray-600 space-y-1"
-            >
-            </div>
+      <!-- Personalizaciones -->
+      <div class="mb-4" id="personalizations-container" style="display: none;">
+        <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
+            ></path>
+          </svg>
+          Personalizaciones
+        </h3>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <div
+            id="personalization-components"
+            class="text-xs text-gray-600 space-y-1"
+          >
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Botones de acción -->
-    <div class="mt-3 justify-center flex flex-col gap-2">
-      <button
-        id="btnBuscar"
-        class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Buscar PC Ideal
-      </button>
-      <button
-        id="btnPedido"
-        class="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden"
-      >
-        Realizar Pedido
-      </button>
-    </div>
-  </section>
-</div>
+  <!-- Botones de acción -->
+  <div class="mt-3 justify-center flex flex-col gap-2">
+    <button
+      id="btnBuscar"
+      class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+    >
+      Buscar PC Ideal
+    </button>
+    <button
+      id="btnPedido"
+      class="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden"
+    >
+      Realizar Pedido
+    </button>
+  </div>
+</section>
 
 <!-- SCRIPT FUNCIONAL -->
 <script>
@@ -262,19 +242,6 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
 
   function ocultarMensaje() {
     document.getElementById("mensaje-estado").classList.add("hidden");
-  }
-
-  // Limpiar resultados anteriores
-  function clearResults() {
-    // Ocultar resultados anteriores
-    document.getElementById("resultado-pc").classList.add("hidden");
-    document.getElementById("btnPedido").classList.add("hidden");
-
-    // Mostrar placeholder inicial
-    document.getElementById("placeholder-inicial").classList.remove("hidden");
-
-    // Limpiar variable global
-    currentBuild = null;
   }
 
   // Recolectar datos de todos los formularios
@@ -356,7 +323,6 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
       ocultarMensaje();
     } catch (error) {
       console.error("Error:", error);
-      clearResults(); // Limpiar resultados anteriores
       mostrarMensaje(error.message, "error");
     }
   }
@@ -470,52 +436,25 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
           "Debes iniciar sesión para realizar un pedido. ¿Deseas ir a la página de login?",
         )
       ) {
-        window.location.href = "/Login";
+        window.location.href = "/login";
       }
       return;
     }
 
-    // Validar que el token sea válido antes de crear el pedido
-    mostrarMensaje("Validando sesión...", "info");
+    mostrarMensaje("Creando pedido...", "info");
+
+    const orderData = {
+      functional_kit_id: currentBuild.build.functional_kit.id,
+      structural_kit_id: currentBuild.build.structural_kit
+        ? currentBuild.build.structural_kit.id
+        : null,
+      personalization_ids: currentBuild.build.personalization_components.map(
+        (p) => p.id,
+      ),
+      total_price: currentBuild.total_price,
+    };
 
     try {
-      // Primero validamos el token con /api/me
-      const validateResponse = await fetch("http://localhost:8000/api/me", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!validateResponse.ok) {
-        // Token inválido o expirado
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("user");
-
-        if (
-          confirm(
-            "Tu sesión ha expirado. Por favor inicia sesión nuevamente. ¿Deseas ir a la página de login?",
-          )
-        ) {
-          window.location.href = "/Login";
-        }
-        return;
-      }
-
-      // Token válido, procedemos a crear el pedido
-      mostrarMensaje("Creando pedido...", "info");
-
-      const orderData = {
-        functional_kit_id: currentBuild.build.functional_kit.id,
-        structural_kit_id: currentBuild.build.structural_kit
-          ? currentBuild.build.structural_kit.id
-          : null,
-        personalization_ids: currentBuild.build.personalization_components.map(
-          (p) => p.id,
-        ),
-        total_price: currentBuild.total_price,
-      };
-
       const response = await fetch("http://localhost:8000/api/orders", {
         method: "POST",
         headers: {
@@ -537,7 +476,7 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
 
       setTimeout(() => {
         if (confirm("Pedido creado con éxito. ¿Deseas ver tus pedidos?")) {
-          window.location.href = "/UserOrder";
+          window.location.href = "/mis-pedidos";
         }
       }, 1000);
     } catch (error) {

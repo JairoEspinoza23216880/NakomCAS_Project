@@ -67,7 +67,7 @@ return function (App $app) {
         $secretKey = $_ENV['JWT_SECRET'] ?? 'clave_secreta_por_defecto_insegura';
         $issuedAt = time();
         //$expirationTime = $issuedAt + 3600 * 8; // El token expira en 8 horas
-        $expirationTime = $issuedAt + 60 * 5; // Tiempo de Expiración para Pruebas
+        $expirationTime = $issuedAt + 60 * 10; // Tiempo de Expiración para Pruebas
 
         $tokenPayload = [
             'iat' => $issuedAt,          // Cuándo se creó
@@ -106,7 +106,7 @@ return function (App $app) {
     /**
      * REGISTRO DE USUARIO
      * Endpoint: POST /api/register
-     * (Espacio reservado para PJDV)
+     * Objetivo: Crear un nuevo usuario con rol Cliente
      */
     $app->post('/api/register', function (Request $request, Response $response) {
 
@@ -118,6 +118,7 @@ return function (App $app) {
         $phoneNumber = $data['phone_number'] ?? null;
         $password = $data['password'] ?? null;
 
+
         // 2. Validación de campos obligatorios
         if (!$name || !$lastname || !$email || !$phoneNumber || !$password) {
             $payload = json_encode([
@@ -128,6 +129,7 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
+
         // 3. Verificar si el email ya existe
         if (User::where('email', $email)->exists()) {
             $payload = json_encode([
@@ -137,6 +139,7 @@ return function (App $app) {
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
         }
+
 
         // 4. Crear usuario (rol cliente por defecto: 2)
         $user = new User([
@@ -149,11 +152,13 @@ return function (App $app) {
         ]);
         $user->save();
 
+
         // 5. El proceso fue exitoso, devuelve respuesta
         $payload = json_encode([
             'success' => true,
             'message' => 'Registro exitoso. Procede a iniciar sesión.'
         ]);
+
 
         // 6. Enviar respuesta
         $response->getBody()->write($payload);
@@ -165,9 +170,10 @@ return function (App $app) {
     /**
      * VERIFICAR SESIÓN
      * Endpoint: GET /api/me
-     * (Espacio reservado para PJDV)
+     * Objetivo: Obtener datos del usuario autenticado usando el Token JWT
      */
     $app->get('/api/me', function (Request $request, Response $response) {
+
         // 1. Obtener datos del usuario autenticado desde el atributo 'user' inyectado por JwtMiddleware
         $userData = $request->getAttribute('user');
 
@@ -180,6 +186,7 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
+
         // 2. Buscar el usuario en la base de datos por ID
         $user = \App\Models\User::find($userData->sub);
         if (!$user) {
@@ -191,7 +198,8 @@ return function (App $app) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
         }
 
-        // Preparar respuesta con datos del usuario
+
+        // 3. Preparar respuesta con datos del usuario
         $responseData = [
             'success' => true,
             'user' => [
@@ -202,6 +210,9 @@ return function (App $app) {
                 'status' => $user->status
             ]
         ];
+
+
+        // 4. Enviar respuesta
         $response->getBody()->write(json_encode($responseData));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     })->add(new \App\Middleware\JwtMiddleware());
