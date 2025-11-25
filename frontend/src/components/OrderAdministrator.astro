@@ -14,27 +14,27 @@
     <thead>
       <tr class="bg-gray-200">
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >ID del Pedido</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Nombre del Cliente</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Fecha del pedido</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Estado Actual</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Precio Total</th
         >
         <th
-          class="pr-12 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+          class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
           >Acciones</th
         >
       </tr>
@@ -146,7 +146,7 @@
     mostrarMensaje("Cargando pedidos...", "info");
 
     try {
-      const response = await fetch("http://localhost/api/admin/orders", {
+      const response = await fetch("http://localhost:8000/api/admin/orders", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -163,7 +163,8 @@
         throw new Error(`Error al cargar pedidos: ${response.status}`);
       }
 
-      pedidos = await response.json();
+      const data = await response.json();
+      pedidos = data.orders || []; // Extraer el array de orders
       ocultarMensaje();
       cargarTabla();
     } catch (error) {
@@ -193,11 +194,11 @@
       fila.className = "hover:bg-gray-50";
 
       fila.innerHTML = `
-        <td class="pr-12 py-3 text-right">${p.id}</td>
-        <td class="pr-12 py-3 text-right">${p.client_name}</td>
-        <td class="pr-12 py-3 text-right">${formatearFecha(p.date)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.id}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.client_name}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatearFecha(p.date)}</td>
 
-        <td class="pr-12 py-3 text-right">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           <select onchange="actualizarEstado(${p.id}, this.value)"
             class="border rounded px-2 py-1 text-sm">
             ${statusOptions
@@ -209,9 +210,9 @@
           </select>
         </td>
 
-        <td class="pr-12 py-3 text-right">$${p.total_price.toFixed(2)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">$${Number(p.total_price || 0).toFixed(2)}</td>
 
-        <td class="pr-12 py-3 text-right">
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
           <button onclick='verDetalles(${p.id})'
             class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm">
             Ver Detalles
@@ -245,19 +246,23 @@
     }
 
     try {
-      const response = await fetch(`http://localhost/api/admin/orders/${id}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://localhost:8000/api/admin/orders/${id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Error al cargar detalles: ${response.status}`);
       }
 
-      const pedido = await response.json();
+      const data = await response.json();
+      const pedido = data.order; // Extraer el objeto order
       mostrarModalDetalles(pedido);
     } catch (error) {
       console.error("Error:", error);
@@ -273,7 +278,7 @@
     document.getElementById("m-email").textContent = pedido.client_info.email;
     document.getElementById("m-phone").textContent = pedido.client_info.phone;
     document.getElementById("m-fecha").textContent = formatearFecha(
-      pedido.created_at,
+      pedido.date,
     );
     document.getElementById("m-total").textContent =
       `$${pedido.financials.total_price.toFixed(2)}`;
@@ -299,7 +304,7 @@
             .map(
               (comp) => `
             <tr>
-              <td class="border border-gray-300 px-4 py-2">${comp.type}</td>
+              <td class="border border-gray-300 px-4 py-2">${comp.type_name || "N/A"}</td>
               <td class="border border-gray-300 px-4 py-2">${comp.name}</td>
               <td class="border border-gray-300 px-4 py-2 text-center">${comp.quantity}</td>
             </tr>
@@ -333,7 +338,7 @@
 
     try {
       const response = await fetch(
-        `http://localhost/api/admin/orders/${id}/status`,
+        `http://localhost:8000/api/admin/orders/${id}/status`,
         {
           method: "PATCH",
           headers: {
