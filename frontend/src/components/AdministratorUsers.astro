@@ -196,7 +196,7 @@
       mostrarMensaje("Cargando usuarios...", "info");
 
       try {
-        const response = await fetch("http://localhost/api/admin/users", {
+        const response = await fetch("http://localhost:8000/api/admin/users", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -352,7 +352,7 @@
 
       try {
         const response = await fetch(
-          `http://localhost/api/admin/users/${id}/status`,
+          `http://localhost:8000/api/admin/users/${id}/status`,
           {
             method: "PATCH",
             headers: {
@@ -440,8 +440,8 @@
         try {
           const method = id ? "PUT" : "POST";
           const url = id
-            ? `http://localhost/api/admin/users/${id}`
-            : "http://localhost/api/admin/users";
+            ? `http://localhost:8000/api/admin/users/${id}`
+            : "http://localhost:8000/api/admin/users";
 
           const response = await fetch(url, {
             method,

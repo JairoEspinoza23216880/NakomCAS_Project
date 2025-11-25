@@ -264,6 +264,19 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
     document.getElementById("mensaje-estado").classList.add("hidden");
   }
 
+  // Limpiar resultados anteriores
+  function clearResults() {
+    // Ocultar resultados anteriores
+    document.getElementById("resultado-pc").classList.add("hidden");
+    document.getElementById("btnPedido").classList.add("hidden");
+
+    // Mostrar placeholder inicial
+    document.getElementById("placeholder-inicial").classList.remove("hidden");
+
+    // Limpiar variable global
+    currentBuild = null;
+  }
+
   // Recolectar datos de todos los formularios
   function collectFormData() {
     const needsAndBoosters = [];
@@ -343,6 +356,7 @@ import Workstation from "./ConfiguracionComponents/Workstation.astro";
       ocultarMensaje();
     } catch (error) {
       console.error("Error:", error);
+      clearResults(); // Limpiar resultados anteriores
       mostrarMensaje(error.message, "error");
     }
   }
