@@ -34,4 +34,10 @@ class User extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    // Relación con el rol de usuario
+    public function userRole()
+    {
+        return $this->belongsTo(UserRole::class, 'user_role_id');
+    }
 }

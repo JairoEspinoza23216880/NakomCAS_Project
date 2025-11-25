@@ -67,7 +67,7 @@ return function (App $app) {
         $secretKey = $_ENV['JWT_SECRET'] ?? 'clave_secreta_por_defecto_insegura';
         $issuedAt = time();
         //$expirationTime = $issuedAt + 3600 * 8; // El token expira en 8 horas
-        $expirationTime = $issuedAt + 60 * 5; // Tiempo de Expiración para Pruebas
+        $expirationTime = $issuedAt + 60 * 10; // Tiempo de Expiración para Pruebas
 
         $tokenPayload = [
             'iat' => $issuedAt,          // Cuándo se creó
@@ -106,7 +106,7 @@ return function (App $app) {
     /**
      * REGISTRO DE USUARIO
      * Endpoint: POST /api/register
-     * (Espacio reservado para PJDV)
+     * Objetivo: Crear un nuevo usuario con rol Cliente
      */
     $app->post('/api/register', function (Request $request, Response $response) {
 
@@ -165,7 +165,7 @@ return function (App $app) {
     /**
      * VERIFICAR SESIÓN
      * Endpoint: GET /api/me
-     * (Espacio reservado para PJDV)
+     * Objetivo: Obtener datos del usuario autenticado usando el Token JWT
      */
     $app->get('/api/me', function (Request $request, Response $response) {
         // 1. Obtener datos del usuario autenticado desde el atributo 'user' inyectado por JwtMiddleware

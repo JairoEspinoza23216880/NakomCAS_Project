@@ -32,11 +32,11 @@ $authRoutes($app);
 $configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
 $configRoutes($app);
 
-//$adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
-//$adminRoutes($app);
+$adminOrdersRoutes = require __DIR__ . '/../app/Routes/adminOrders.php';
+$adminOrdersRoutes($app);
 
-//$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
-//$ordersRoutes($app);
+$ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
+$ordersRoutes($app);
 
 // -----------------------
 // --- RUTAS DE PRUEBA ---

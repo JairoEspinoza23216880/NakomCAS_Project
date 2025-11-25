@@ -18,8 +18,8 @@ class Order extends Model
         'status'
     ];
 
-    // Activar timestamps
-    public $timestamps = true;
+    // Desactivar timestamps automáticos (solo existe created_at en la tabla)
+    public $timestamps = false;
 
 
     // RELACIONES
