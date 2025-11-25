@@ -17,7 +17,7 @@ return function (App $app) {
             'component_type_id' => ['positive' => true, 'label' => 'tipo de componente'],
             'price' => ['positive' => false, 'label' => 'precio'],
             'stock' => ['positive' => false, 'label' => 'stock'],
-            'tier' => ['positive' => true, 'label' => 'gama']
+            'tier' => ['tier' => true, 'label' => 'gama']
         ];
         foreach ($numericFields as $field => $opts) {
             if (!is_numeric($data[$field])) {
@@ -26,13 +26,20 @@ return function (App $app) {
                     'message' => "El campo '{$field}' ({$opts['label']}) debe ser numérico."
                 ];
             }
-            if ($opts['positive'] && intval($data[$field]) <= 0) {
+            if (isset($opts['positive']) && $opts['positive'] && intval($data[$field]) <= 0) {
                 return [
                     'success' => false,
                     'message' => "El campo '{$field}' ({$opts['label']}) debe ser un número positivo."
                 ];
             }
-            if (!$opts['positive'] && floatval($data[$field]) < 0) {
+            // tier puede ser 0 o mayor
+            if (isset($opts['tier']) && $opts['tier'] && intval($data[$field]) < 0) {
+                return [
+                    'success' => false,
+                    'message' => "El campo '{$field}' ({$opts['label']}) debe ser 0 (Gama de Entrada) o mayor."
+                ];
+            }
+            if (isset($opts['positive']) && !$opts['positive'] && floatval($data[$field]) < 0) {
                 return [
                     'success' => false,
                     'message' => "El campo '{$field}' ({$opts['label']}) debe ser mayor o igual a cero."
@@ -223,8 +230,88 @@ return function (App $app) {
      * Objetivo: Editar los datos de un componente existente
      */
     $app->put('/api/admin/components/{id}', function (Request $request, Response $response, $args) {
-        // Editar un componente existente
-    })->add(new JwtMiddleware());
+        try {
+
+            // 1. Validar el parámetro ID
+            $componentId = $args['id'];
+            if (!is_numeric($componentId)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El ID del componente debe ser numérico.'
+                ]));
+                return $response->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+
+            // 2. Buscar el componente
+            $component = \App\Models\Component::find($componentId);
+            if (!$component) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Componente no encontrado.'
+                ]));
+                return $response->withStatus(404)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+
+            // 3. Obtener y validar datos
+            $data = $request->getParsedBody();
+            $required = ['name', 'price', 'stock', 'tier'];
+            foreach ($required as $field) {
+                if (!isset($data[$field]) || $data[$field] === '') {
+                    $response->getBody()->write(json_encode([
+                        'success' => false,
+                        'message' => "El campo '$field' es obligatorio."
+                    ]));
+                    return $response->withStatus(400)
+                        ->withHeader('Content-Type', 'application/json');
+                }
+            }
+
+
+            // 4. Validar tipos y valores
+            // Usamos la función privada, pero solo para los campos editables
+            $validateData = [
+                'component_type_id' => $component->component_type_id, // No editable aquí
+                'price' => $data['price'],
+                'stock' => $data['stock'],
+                'tier' => $data['tier']
+            ];
+            if ($error = validateComponentData($validateData)) {
+                $response->getBody()->write(json_encode($error));
+                return $response->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+
+            // 5. Actualizar datos
+            $component->name = $data['name'];
+            $component->price = $data['price'];
+            $component->stock = $data['stock'];
+            $component->tier = $data['tier'];
+            $component->save();
+
+
+            // 6. Respuesta exitosa
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => 'Inventario actualizado.'
+            ]));
+            return $response->withStatus(200)
+                ->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+
+            // 7. Manejo de errores internos con mensaje específico
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Ocurrió un error inesperado al editar el componente.'
+            ]));
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json');
+        }
+    })->add(new AdminMiddleware())->add(new JwtMiddleware());
 
 
 
@@ -234,6 +321,60 @@ return function (App $app) {
      * Objetivo: Activar o desactivar un componente
      */
     $app->patch('/api/admin/components/{id}/status', function (Request $request, Response $response, $args) {
-        // Desactivar o activar un componente
-    })->add(new JwtMiddleware());
+        try {
+            // 1. Validar el parámetro ID
+            $componentId = $args['id'];
+            if (!is_numeric($componentId)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El ID del componente debe ser numérico.'
+                ]));
+                return $response->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            // 2. Buscar el componente
+            $component = \App\Models\Component::find($componentId);
+            if (!$component) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Componente no encontrado.'
+                ]));
+                return $response->withStatus(404)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            // 3. Obtener y validar el nuevo estado
+            $data = $request->getParsedBody();
+            $newStatus = $data['status'] ?? null;
+            $allowedStatuses = ['Activo', 'Inactivo'];
+            if (!$newStatus || !in_array($newStatus, $allowedStatuses)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => "El estado debe ser 'Activo' o 'Inactivo'."
+                ]));
+                return $response->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            // 4. Actualizar estado y guardar
+            $component->status = $newStatus;
+            $component->save();
+
+            // 5. Respuesta exitosa
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => "Componente " . ($newStatus === 'Activo' ? 'activado' : 'desactivado') . "."
+            ]));
+            return $response->withStatus(200)
+                ->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Ocurrió un error inesperado al cambiar el estado del componente.'
+            ]));
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json');
+        }
+    })->add(new AdminMiddleware())->add(new JwtMiddleware());
 };
