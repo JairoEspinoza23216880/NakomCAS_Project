@@ -5,55 +5,26 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use App\Models\Order;
-use App\Models\User;
 use App\Middleware\JwtMiddleware;
+use App\Middleware\AdminMiddleware;
 
-// Función para autenticar usuario y obtener el rol
-if (!function_exists('authenticateAdmin')) {
-    function authenticateAdmin($request)
-    {
-        $jwtUser = $request->getAttribute('user');
-        if (!$jwtUser || !isset($jwtUser->sub)) {
-            return [
-                'success' => false,
-                'code' => 401,
-                'message' => 'No se pudo identificar al usuario.'
-            ];
-        }
-        $user = User::with('userRole')->find($jwtUser->sub);
-        if (!$user || !$user->userRole || stripos(strtolower($user->userRole->name), 'admin') === false) {
-            return [
-                'success' => false,
-                'code' => 403,
-                'message' => 'Acceso denegado: solo administradores pueden realizar esta acción.'
-            ];
-        }
-        return [
-            'success' => true,
-            'user' => $user
-        ];
-    }
-}
 
-// Rutas para administración de pedidos
 return function (App $app) {
-    // Middleware: Solo usuarios con rol Vendedor
+
+    /**
+     * OBTENER TODOS LOS PEDIDOS (ADMIN)
+     * Endpoint: GET /api/admin/orders
+     * Objetivo: Retornar la lista de todos los pedidos con información resumida
+     */
     $app->get('/api/admin/orders', function (Request $request, Response $response) {
         try {
-            $auth = authenticateAdmin($request);
-            if (!$auth['success']) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => $auth['message']
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
-            }
-            $user = $auth['user'];
-
+            // 1. Obtener todos los pedidos con información resumida
             $orders = Order::with(['user'])
                 ->orderBy('id', 'desc')
                 ->get();
 
+
+            // 2. Formatear resultado
             $result = $orders->map(function ($order) {
                 $summary_name = '';
                 if ($order->user) {
@@ -71,32 +42,35 @@ return function (App $app) {
                 ];
             });
 
+
+            // 3. Enviar respuesta
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'orders' => $result
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
+
+            // 4. Manejar errores inesperados
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error al obtener los pedidos: ' . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
-    })->add(new JwtMiddleware());
+    })->add(new AdminMiddleware())->add(new JwtMiddleware());
 
 
+
+    /**
+     * OBTENER PEDIDO POR ID (ADMIN)
+     * Endpoint: GET /api/admin/orders/{id}
+     * Objetivo: Retornar los detalles de un pedido específico
+     */
     $app->get('/api/admin/orders/{id}', function (Request $request, Response $response, $args) {
         try {
-            $auth = authenticateAdmin($request);
-            if (!$auth['success']) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => $auth['message']
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
-            }
 
+            // 1. Validar el parámetro ID
             $orderId = $args['id'];
             if (!is_numeric($orderId)) {
                 $response->getBody()->write(json_encode([
@@ -106,6 +80,8 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
+
+            // 2. Buscar el pedido y sus relaciones
             $order = Order::with(['user', 'components.componentType'])->find($orderId);
             if (!$order) {
                 $response->getBody()->write(json_encode([
@@ -115,6 +91,8 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
+
+            // 3. Formatear resultado
             $result = [
                 'id' => $order->id,
                 'status' => $order->status,
@@ -138,31 +116,35 @@ return function (App $app) {
                 })
             ];
 
+
+            // 4. Enviar respuesta
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'order' => $result
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
+
+            // 5. Manejar errores inesperados
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error al obtener el pedido: ' . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
-    })->add(new JwtMiddleware());
+    })->add(new AdminMiddleware())->add(new JwtMiddleware());
 
+
+
+    /**
+     * ACTUALIZAR ESTADO DE PEDIDO (ADMIN)
+     * Endpoint: PATCH /api/admin/orders/{id}/status
+     * Objetivo: Cambiar el estado de un pedido específico
+     */
     $app->patch('/api/admin/orders/{id}/status', function (Request $request, Response $response, $args) {
         try {
-            $auth = authenticateAdmin($request);
-            if (!$auth['success']) {
-                $response->getBody()->write(json_encode([
-                    'success' => false,
-                    'message' => $auth['message']
-                ]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus($auth['code']);
-            }
 
+            // 1. Validar el parámetro ID
             $orderId = $args['id'];
             if (!is_numeric($orderId)) {
                 $response->getBody()->write(json_encode([
@@ -172,6 +154,8 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
+
+            // 2. Buscar el pedido
             $order = Order::find($orderId);
             if (!$order) {
                 $response->getBody()->write(json_encode([
@@ -181,6 +165,8 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
+
+            // 3. Validar el nuevo estado
             $body = $request->getParsedBody();
             $newStatus = $body['status'] ?? null;
             $allowedStatuses = [
@@ -201,9 +187,13 @@ return function (App $app) {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
+
+            // 4. Actualizar estado y guardar
             $order->status = $newStatus;
             $order->save();
 
+
+            // 5. Enviar respuesta
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'order_id' => $order->id,
@@ -212,11 +202,13 @@ return function (App $app) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
+
+            // 6. Manejar errores inesperados
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error al actualizar el estado: ' . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
-    })->add(new JwtMiddleware());
+    })->add(new AdminMiddleware())->add(new JwtMiddleware());
 };
