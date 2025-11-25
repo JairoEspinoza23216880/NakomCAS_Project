@@ -10,7 +10,7 @@ use App\Models\User;
 
 return function (App $app) {
     // Función privada para validar y actualizar campos editables de usuario
-    function validarYActualizarUsuario($user, $data)
+    function validateAndUpdateUser($user, $data)
     {
         $editable = ['name', 'lastname', 'email', 'phone_number', 'password'];
         $updated = false;
@@ -202,7 +202,7 @@ return function (App $app) {
 
             // 2. Validar campos editables
             // Validar y actualizar usuario usando función privada
-            $resultado = validarYActualizarUsuario($user, $data);
+            $resultado = validateAndUpdateUser($user, $data);
             if (isset($resultado['error'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -238,6 +238,57 @@ return function (App $app) {
      * Objetivo: Activar o desactivar usuario (soft delete)
      */
     $app->patch('/api/admin/users/{id}/status', function (Request $request, Response $response, $args) {
-        // Aquí va el código
+        try {
+
+            // 1. Obtener ID y datos
+            $userId = $args['id'];
+            $data = $request->getParsedBody();
+
+
+            // 2. Validar campo status
+            if (!isset($data['status']) || !in_array($data['status'], ['Activo', 'Inactivo'])) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Datos inválidos.'
+                ]));
+                return $response->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+
+            // 3. Buscar usuario
+            $user = User::find($userId);
+            if (!$user) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Usuario no encontrado.'
+                ]));
+                return $response->withStatus(404)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+
+            // 4. Actualizar estado
+            $user->status = $data['status'];
+            $user->save();
+
+
+            // 5. Respuesta exitosa
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => 'Estado de usuario actualizado correctamente.'
+            ]));
+            return $response->withStatus(200)
+                ->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+
+            // 6. Manejar errores inesperados
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error al cambiar el estado: ' . $e->getMessage()
+            ]));
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json');
+        }
     })->add(new AdminMiddleware())->add(new JwtMiddleware());
 };
