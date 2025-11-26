@@ -1,0 +1,15 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import AdminPedidos from "../../components/admin/OrderAdministrator.astro";
+---
+
+<Layout title="Administración de Pedidos">
+    <AdminPedidos />
+</Layout>
+
+<script>
+    import { protectRoute, ROLES } from "../../lib/auth.js";
+
+    // Proteger esta ruta - solo admin/vendedor
+    protectRoute([ROLES.ADMIN_VENDEDOR]);
+</script>

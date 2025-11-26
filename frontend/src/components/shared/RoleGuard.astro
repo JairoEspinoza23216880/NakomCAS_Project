@@ -1,0 +1,53 @@
+---
+/**
+ * Componente para proteger secciones de UI basado en roles de usuario
+ * Solo muestra el contenido si el usuario tiene uno de los roles permitidos
+ * Usa localStorage para verificar el rol
+ */
+const { allowedRoles = [], fallbackMessage = "" } = Astro.props;
+---
+
+<div
+    class="role-guard"
+    data-allowed-roles={JSON.stringify(allowedRoles)}
+    data-fallback={fallbackMessage}
+>
+    <slot />
+</div>
+
+{
+    fallbackMessage && (
+        <div class="role-guard-fallback hidden bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+            <p>{fallbackMessage}</p>
+        </div>
+    )
+}
+
+<script>
+    import { getUserFromStorage, hasRole } from "../../lib/auth.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const guards = document.querySelectorAll(".role-guard");
+
+        guards.forEach((guard) => {
+            const allowedRoles = JSON.parse(
+                guard.getAttribute("data-allowed-roles") || "[]",
+            );
+            const user = getUserFromStorage();
+
+            if (!hasRole(user, allowedRoles)) {
+                // Ocultar contenido protegido
+                guard.classList.add("hidden");
+
+                // Mostrar mensaje alternativo si existe
+                const fallback = guard.nextElementSibling;
+                if (
+                    fallback &&
+                    fallback.classList.contains("role-guard-fallback")
+                ) {
+                    fallback.classList.remove("hidden");
+                }
+            }
+        });
+    });
+</script>

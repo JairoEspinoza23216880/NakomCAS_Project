@@ -1,0 +1,496 @@
+---
+// Tipos de componentes estáticos como fallback
+const TIPOS_COMPONENTES_FALLBACK = [
+  { id: 1, name: "Procesador" },
+  { id: 2, name: "Tarjeta Gráfica" },
+  { id: 3, name: "Memoria RAM" },
+  { id: 4, name: "Tarjeta Madre" },
+  { id: 5, name: "Almacenamiento" },
+  { id: 6, name: "Disipador" },
+  { id: 7, name: "Gabinete" },
+  { id: 8, name: "Fuente de Poder" },
+];
+---
+
+<div class="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+  <h1 class="text-center text-3xl font-bold text-gray-800 mb-5 mt-5">
+    Administración de Componentes
+  </h1>
+
+  <div class="max-w-7xl mx-auto">
+    <div class="bg-white p-6 shadow-xl rounded-lg border border-gray-100 mb-8">
+      <h2 id="form-title" class="text-2xl font-semibold text-gray-700 mb-4">
+        Crear Nuevo Componente
+      </h2>
+
+      <div
+        id="form-error"
+        class="p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg hidden"
+      >
+      </div>
+
+      <form
+        id="component-form"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+      >
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-gray-700"
+            >Nombre</label
+          >
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            required
+            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label for="tipo" class="block text-sm font-medium text-gray-700"
+            >Tipo</label
+          >
+          <select
+            id="tipo"
+            name="tipo"
+            required
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md"
+          >
+            <option value="" disabled selected>Seleccione un Tipo</option>
+            {
+              TIPOS_COMPONENTES_FALLBACK.map((type) => (
+                <option value={type.id}>{type.name}</option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="gama" class="block text-sm font-medium text-gray-700"
+            >Gama (1-5)</label
+          >
+          <input
+            type="number"
+            id="gama"
+            name="gama"
+            min="1"
+            max="5"
+            required
+            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label for="precio" class="block text-sm font-medium text-gray-700"
+            >Precio ($)</label
+          >
+          <input
+            type="number"
+            id="precio"
+            name="precio"
+            step="0.01"
+            min="0"
+            required
+            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label for="stock" class="block text-sm font-medium text-gray-700"
+            >Stock</label
+          >
+          <input
+            type="number"
+            id="stock"
+            name="stock"
+            min="0"
+            required
+            class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div class="lg:col-span-5 flex gap-2">
+          <button
+            type="submit"
+            id="submit-button"
+            class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+          >
+            Crear Componente
+          </button>
+          <button
+            type="button"
+            id="cancel-button"
+            class="hidden flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div
+      class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100 p-4"
+    >
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-xl font-semibold text-gray-700">
+          Inventario de Componentes
+        </h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Nombre</th
+              >
+              <th
+                class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Tipo</th
+              >
+              <th
+                class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Gama</th
+              >
+              <th
+                class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Precio</th
+              >
+              <th
+                class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Stock</th
+              >
+              <th
+                class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Estado</th
+              >
+              <th
+                class="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >Acciones</th
+              >
+            </tr>
+          </thead>
+          <tbody
+            id="component-table-body"
+            class="bg-white divide-y divide-gray-200"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // API Functions inlined
+  const API_URL = "http://localhost:8000/api";
+
+  async function getComponentTypes(token) {
+    const response = await fetch(`${API_URL}/admin/component-types`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) throw new Error("Error al obtener tipos");
+    return await response.json();
+  }
+
+  async function getComponents(token) {
+    const response = await fetch(`${API_URL}/admin/components`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) throw new Error("Error al obtener componentes");
+    return await response.json();
+  }
+
+  async function createComponent(componentData, token) {
+    const response = await fetch(`${API_URL}/admin/components`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(componentData),
+    });
+    if (!response.ok) throw new Error("Error al crear componente");
+    return await response.json();
+  }
+
+  async function updateComponent(id, componentData, token) {
+    const response = await fetch(`${API_URL}/admin/components/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(componentData),
+    });
+    if (!response.ok) throw new Error("Error al actualizar componente");
+    return await response.json();
+  }
+
+  async function toggleComponentStatus(id, status, token) {
+    const response = await fetch(`${API_URL}/admin/components/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) throw new Error("Error al cambiar estado");
+    return await response.json();
+  }
+
+  // Estado
+  let components = [];
+  let componentTypes = [];
+  let isEditingId = null;
+  let authToken = null;
+
+  // DOM
+  const form = document.getElementById("component-form");
+  const tableBody = document.getElementById("component-table-body");
+  const errorDisplay = document.getElementById("form-error");
+  const formTitle = document.getElementById("form-title");
+  const submitButton = document.getElementById("submit-button");
+  const cancelButton = document.getElementById("cancel-button");
+  const tipoSelect = document.getElementById("tipo");
+
+  if (
+    !form ||
+    !tableBody ||
+    !errorDisplay ||
+    !formTitle ||
+    !submitButton ||
+    !cancelButton ||
+    !tipoSelect
+  ) {
+    throw new Error("Elementos del DOM requeridos no encontrados.");
+  }
+
+  async function loadComponentTypes() {
+    try {
+      const apiTypes = await getComponentTypes(authToken);
+      if (apiTypes && Array.isArray(apiTypes) && apiTypes.length > 0) {
+        componentTypes = apiTypes;
+        tipoSelect.innerHTML =
+          '<option value="" disabled selected>Seleccione un Tipo</option>';
+        componentTypes.forEach((type) => {
+          const option = document.createElement("option");
+          option.value = type.id;
+          option.textContent = type.name;
+          tipoSelect.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.warn("No se pudieron cargar tipos desde la API:", error.message);
+      componentTypes = Array.from(tipoSelect.options)
+        .filter((opt) => opt.value !== "")
+        .map((opt) => ({
+          id: parseInt(opt.value),
+          name: opt.textContent,
+        }));
+    }
+  }
+
+  async function loadComponents() {
+    try {
+      const data = await getComponents(authToken);
+      if (!Array.isArray(data)) {
+        console.error("La respuesta no es un array:", data);
+        components = [];
+        renderizar();
+        return;
+      }
+      components = data.map((comp) => ({
+        id: comp.id,
+        nombre: comp.name,
+        tipo: comp.type_name,
+        tipo_id: comp.component_type_id || comp.type_id,
+        gama: comp.tier,
+        precio: comp.price,
+        stock: comp.stock,
+        estado: comp.status,
+      }));
+      renderizar();
+    } catch (error) {
+      console.warn(
+        "No se pudieron cargar componentes desde la API:",
+        error.message,
+      );
+      components = [];
+      renderizar();
+    }
+  }
+
+  function showError(message) {
+    errorDisplay.textContent = message;
+    errorDisplay.classList.remove("hidden");
+    setTimeout(() => errorDisplay.classList.add("hidden"), 5000);
+  }
+
+  function validateForm(data) {
+    if (!data.name || !data.component_type_id)
+      return "El Nombre y Tipo son requeridos.";
+    if ((data.tier || 0) < 1 || (data.tier || 0) > 5)
+      return "La Gama debe ser entre 1 y 5.";
+    if ((data.price || 0) <= 0) return "El Precio debe ser mayor a 0.";
+    if ((data.stock || 0) < 0) return "El Stock no puede ser negativo.";
+    return null;
+  }
+
+  function renderizar() {
+    tableBody.innerHTML = "";
+    if (components.length === 0) {
+      const row = tableBody.insertRow();
+      const cell = row.insertCell();
+      cell.colSpan = 7;
+      cell.className = "text-center py-4 text-gray-500";
+      cell.textContent = "No hay componentes registrados";
+      return;
+    }
+    components.forEach((component) => {
+      const row = tableBody.insertRow();
+      row.className =
+        component.estado === "Inactivo" ? "bg-red-50 opacity-75" : "";
+      row.insertCell().textContent = component.nombre;
+      row.insertCell().textContent = component.tipo;
+      row.insertCell().textContent = component.gama.toString();
+      row.insertCell().textContent = `$${component.precio.toFixed(2)}`;
+      row.insertCell().textContent = component.stock.toString();
+      const statusCell = row.insertCell();
+      statusCell.innerHTML = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${component.estado === "Activo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}">${component.estado}</span>`;
+      const actionsCell = row.insertCell();
+      actionsCell.className =
+        "px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2";
+      actionsCell.innerHTML = `<button class="text-indigo-600 hover:text-indigo-900 edit-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>Editar</button><button class="${component.estado === "Activo" ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"} toggle-status-btn" data-id="${component.id}" ${isEditingId ? "disabled" : ""}>${component.estado === "Activo" ? "Desactivar" : "Reactivar"}</button>`;
+    });
+    document.querySelectorAll(".edit-btn").forEach((button) => {
+      button.addEventListener("click", () =>
+        startEdit(button.getAttribute("data-id")),
+      );
+    });
+    document.querySelectorAll(".toggle-status-btn").forEach((button) => {
+      button.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await toggleStatus(button.getAttribute("data-id"));
+      });
+    });
+  }
+
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    errorDisplay.textContent = "";
+    errorDisplay.classList.add("hidden");
+    const nombreEl = form.elements.namedItem("nombre");
+    const tipoEl = form.elements.namedItem("tipo");
+    const gamaEl = form.elements.namedItem("gama");
+    const precioEl = form.elements.namedItem("precio");
+    const stockEl = form.elements.namedItem("stock");
+    const formData = {
+      name: nombreEl && nombreEl.value ? nombreEl.value : "",
+      component_type_id:
+        parseInt(tipoEl && tipoEl.value ? tipoEl.value : "0") || 0,
+      tier: parseInt(gamaEl && gamaEl.value ? gamaEl.value : "0") || 0,
+      price: parseFloat(precioEl && precioEl.value ? precioEl.value : "0") || 0,
+      stock: parseInt(stockEl && stockEl.value ? stockEl.value : "0") || 0,
+    };
+    const validationError = validateForm(formData);
+    if (validationError) {
+      showError(validationError);
+      return;
+    }
+    try {
+      submitButton.disabled = true;
+      submitButton.textContent = isEditingId ? "Guardando..." : "Creando...";
+      if (isEditingId) {
+        await updateComponent(isEditingId, formData, authToken);
+        cancelEdit();
+      } else {
+        await createComponent(formData, authToken);
+        form.reset();
+      }
+      await loadComponents();
+    } catch (error) {
+      console.error("Error al guardar componente:", error);
+      showError("Error al guardar: " + error.message);
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = isEditingId
+        ? "Guardar Cambios"
+        : "Crear Componente";
+    }
+  }
+
+  function startEdit(id) {
+    const component = components.find((c) => c.id == id);
+    if (!component) return;
+    isEditingId = id;
+    const nombreEl = form.elements.namedItem("nombre");
+    const tipoEl = form.elements.namedItem("tipo");
+    const gamaEl = form.elements.namedItem("gama");
+    const precioEl = form.elements.namedItem("precio");
+    const stockEl = form.elements.namedItem("stock");
+    if (nombreEl && nombreEl instanceof HTMLInputElement)
+      nombreEl.value = component.nombre;
+    if (tipoEl && tipoEl instanceof HTMLSelectElement) {
+      const typeId =
+        component.tipo_id ||
+        componentTypes.find((t) => t.name === component.tipo)?.id;
+      tipoEl.value = typeId ? typeId.toString() : "";
+    }
+    if (gamaEl && gamaEl instanceof HTMLInputElement)
+      gamaEl.value = component.gama.toString();
+    if (precioEl && precioEl instanceof HTMLInputElement)
+      precioEl.value = component.precio.toString();
+    if (stockEl && stockEl instanceof HTMLInputElement)
+      stockEl.value = component.stock.toString();
+    if (formTitle)
+      formTitle.textContent = `Editar Componente: ${component.nombre}`;
+    if (submitButton) submitButton.textContent = "Guardar Cambios";
+    if (cancelButton) cancelButton.classList.remove("hidden");
+    renderizar();
+  }
+
+  function cancelEdit() {
+    isEditingId = null;
+    form.reset();
+    if (formTitle) formTitle.textContent = "Crear Nuevo Componente";
+    if (submitButton) submitButton.textContent = "Crear Componente";
+    if (cancelButton) cancelButton.classList.add("hidden");
+    renderizar();
+  }
+
+  async function toggleStatus(id) {
+    const component = components.find((c) => c.id == id);
+    if (!component) return;
+    const newStatus = component.estado === "Activo" ? "Inactivo" : "Activo";
+    try {
+      await toggleComponentStatus(id, newStatus, authToken);
+      component.estado = newStatus;
+      renderizar();
+    } catch (error) {
+      console.warn("API no disponible:", error.message);
+      component.estado = newStatus;
+      renderizar();
+    }
+  }
+
+  async function init() {
+    authToken = localStorage.getItem("token");
+    if (!authToken) {
+      console.warn("No hay token de autenticación.");
+    }
+    await loadComponentTypes();
+    await loadComponents();
+    form.addEventListener("submit", handleFormSubmit);
+    cancelButton.addEventListener("click", cancelEdit);
+  }
+
+  init();
+</script>

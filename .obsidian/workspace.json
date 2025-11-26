@@ -1,0 +1,208 @@
+{
+  "main": {
+    "id": "2fe964c3d3625edd",
+    "type": "split",
+    "children": [
+      {
+        "id": "c6992f5fd0e71688",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "447f7e36fb742b28",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "backend/app/Models/README_models.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README_models"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "81a006064ef616ed",
+    "type": "split",
+    "children": [
+      {
+        "id": "82395c8762838cd7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1a87d7964f7642d7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "9c8095cd688d661f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "9a7ed18b2b7a29e9",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 248.5110321044922
+  },
+  "right": {
+    "id": "493f593e83a2f71e",
+    "type": "split",
+    "children": [
+      {
+        "id": "6fd5e732bd7b9525",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5fb21f153b7be411",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/Reglas para uso de Github.md",
+                "collapseAll": true,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes de Reglas para uso de Github"
+            }
+          },
+          {
+            "id": "5656950fe9b26844",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes"
+            }
+          },
+          {
+            "id": "74398b937877000b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "724ccbef0c2dae98",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "671d46fd9e378105",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "backend/app/Models/README_models.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema de README_models"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 330.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "447f7e36fb742b28",
+  "lastOpenFiles": [
+    "backend/app/Models/README_models.md",
+    "docs/Reglas para uso de Github.md",
+    "backend/README_standard.md",
+    "backend/README_DEV.md",
+    "backend/app/Routes/orders.php",
+    "backend/app/Routes/admin.php",
+    "backend/app/Routes/configurator.php",
+    "backend/app/Routes/auth.php",
+    "backend/app/Models/DanielMapNeed.php",
+    "backend/app/Models/FunctionalKit.php",
+    "backend/app/Models/FunctionalKits",
+    "backend/app/Models/Kits",
+    "backend/app/Models/User.php",
+    "backend/README_composer.md",
+    "backend/sqlfiles/schema.sql",
+    "docs/Diseño de la Base de Datos.md",
+    "docs/Contrato API.md",
+    "docs/Configuración de Computadoras.md",
+    "docs/Requerimientos No Funcionales.md",
+    "docs/Requerimientos Funcionales.md"
+  ]
+}

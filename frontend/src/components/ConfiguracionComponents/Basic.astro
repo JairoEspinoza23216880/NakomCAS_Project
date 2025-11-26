@@ -1,0 +1,115 @@
+---
+let valorInicial = 0;
+---
+
+<h2 class="text-center text-3xl font-bold text-gray-800 mb-2">
+  Configuración Básica
+</h2>
+<p class="text-gray-600 mb-6 mt-5">
+  Selecciona las opciones básicas para tu configuración ideal.
+</p>
+<div class="flex flex-col gap-6">
+  <!-- <div class="">
+    <label class="block text-sm font-medium text-gray-700"
+      >Presupuesto máximo (Opcional)</label
+    >
+    <div class="flex items-center gap-2 mt-1">
+      <input
+        id="inputPresupuesto"
+        type="number"
+        min="0"
+        placeholder="15000"
+        class="w-32 rounded-md border-gray-300 p-2 bg-gray-200"
+      />
+      <input
+        id="sliderPresupuesto"
+        type="range"
+        min="0"
+        max="100000"
+        step="500"
+        class="w-full max-w-sm"
+      />
+      <p id="textoValor" class="text-gray-700 text-md">Total: $0 MXN</p>
+    </div>
+  </div> -->
+
+  <!-- ALMACENAMIENTO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">Almacenamiento</label
+    >
+    <select
+      data-personalization
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      name="Almacenamiento"
+      id="Almacenamiento"
+    >
+      <option value="" disabled selected class="text-gray-400"
+        >Selecciona una opción</option
+      >
+      <option value="512GB" class="text-gray-900">512GB SSD</option>
+      <option value="1TB" class="text-gray-900">1TB SSD</option>
+      <option value="2TB" class="text-gray-900">2TB SSD</option>
+    </select>
+  </div>
+
+  <!-- TAMAÑO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700"
+      >Tamaño del Gabinete</label
+    >
+    <select
+      data-personalization
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      name="tamanio"
+      id="tamanio"
+    >
+      <option value="" disabled selected class="text-gray-400"
+        >Selecciona una opción</option
+      >
+      <option value="Pequeño" class="text-gray-900">Pequeño (ITX)</option>
+      <option value="Normal" class="text-gray-900">Normal (ATX)</option>
+      <option value="Grande" class="text-gray-900">Grande (E-ATX)</option>
+    </select>
+  </div>
+
+  <!-- COMENTARIO -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700"
+      >Comentario Adicional</label
+    >
+    <textarea
+      class="w-full mt-1 bg-gray-100 rounded-lg p-3 h-32 resize-none focus:ring-2 focus:ring-gray-200"
+      placeholder="Escribe tu comentario..."></textarea>
+  </div>
+</div>
+
+<!-- <script>
+  const inputPresupuesto = document.getElementById("inputPresupuesto");
+  const sliderPresupuesto = document.getElementById("sliderPresupuesto");
+  const textoValor = document.getElementById("textoValor");
+
+  function actualizarTexto(valor) {
+    textoValor.textContent = `Total: $${Number(valor).toLocaleString()}MXN`;
+  }
+
+  // Input → Slider
+  inputPresupuesto.addEventListener("input", (e) => {
+    let valor = Number(e.target.value);
+
+    if (valor > 1000000) valor = 1000000;
+    if (valor < 0) valor = 0;
+
+    sliderPresupuesto.value = valor;
+    actualizarTexto(valor);
+  });
+
+  // Slider → Input
+  sliderPresupuesto.addEventListener("input", (e) => {
+    const valor = Number(e.target.value);
+    inputPresupuesto.value = valor;
+    actualizarTexto(valor);
+  });
+
+  // Inicializar texto
+  actualizarTexto(inputPresupuesto.value);
+</script> -->
