@@ -89,7 +89,7 @@
   </div>
 </div>
 
-<script is:"client">
+<script is:inline>
   // Estados permitidos según el contrato API
   const statusOptions = [
     "Pedido Recibido",
@@ -258,7 +258,11 @@
       );
 
       if (!response.ok) {
-        throw new Error(`Error al cargar detalles: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Error response:", errorData);
+        throw new Error(
+          `Error al cargar detalles: ${response.status} - ${errorData.message || ""}`,
+        );
       }
 
       const data = await response.json();
@@ -281,7 +285,7 @@
       pedido.date,
     );
     document.getElementById("m-total").textContent =
-      `$${pedido.financials.total_price.toFixed(2)}`;
+      `$${Number(pedido.financials.total_price).toFixed(2)}`;
     document.getElementById("m-estado").textContent = pedido.status;
 
     // Cargar componentes
