@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "c6992f5fd0e71688",
+        "id": "26b158001795b365",
         "type": "tabs",
         "children": [
           {
-            "id": "447f7e36fb742b28",
+            "id": "46fe5658470ab889",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "backend/app/Models/README_models.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "README_models"
+              "title": "Nueva pestaña"
             }
           }
         ]
@@ -155,13 +151,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "backend/app/Models/README_models.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Esquema de README_models"
+              "title": "Esquema"
             }
           }
         ],
@@ -182,10 +177,27 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "447f7e36fb742b28",
+  "active": "46fe5658470ab889",
   "lastOpenFiles": [
-    "backend/app/Models/README_models.md",
+    "docs/Contrato del API.md",
     "docs/Reglas para uso de Github.md",
+    "docs/Manual Técnico para Instalación y Ejecución.md",
+    "docs/Manual de Usuario.md",
+    "docs/Diseño del Sistema.md",
+    "docs/Manual Técnico.md",
+    "docs/Nakom CAS.md",
+    "docs/Diseño de la Base de Datos.md",
+    "docs/Requerimientos No Funcionales.md",
+    "docs/Requerimientos Funcionales.md",
+    "docs/Contrato API.md",
+    "docs/Configuración de Computadoras.md",
+    "docs/assets/Diagrama Entidad Relacion.png",
+    "docs/assets/Diagrama de Secuencia.png",
+    "docs/assets/Diagrama de Componentes.png",
+    "docs/assets/Diagrama de Actividad.png",
+    "docs/assets.md",
+    "docs/assets",
+    "backend/app/Models/README_models.md",
     "backend/README_standard.md",
     "backend/README_DEV.md",
     "backend/app/Routes/orders.php",
@@ -197,12 +209,6 @@
     "backend/app/Models/FunctionalKits",
     "backend/app/Models/Kits",
     "backend/app/Models/User.php",
-    "backend/README_composer.md",
-    "backend/sqlfiles/schema.sql",
-    "docs/Diseño de la Base de Datos.md",
-    "docs/Contrato API.md",
-    "docs/Configuración de Computadoras.md",
-    "docs/Requerimientos No Funcionales.md",
-    "docs/Requerimientos Funcionales.md"
+    "backend/README_composer.md"
   ]
 }
