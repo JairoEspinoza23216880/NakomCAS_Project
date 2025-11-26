@@ -11,11 +11,11 @@ export async function registerUser(userData) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error en el registro');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -34,11 +34,11 @@ export async function loginUser(credentials) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error en el login');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -57,11 +57,11 @@ export async function validateSession(token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error en la validación de sesión');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -80,11 +80,11 @@ export async function searchConfiguration(configData) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error en la búsqueda de configuración');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -104,11 +104,11 @@ export async function createOrder(orderData, token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al crear el pedido');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -131,11 +131,11 @@ export async function getComponentTypes(token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al obtener tipos de componentes');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -154,11 +154,11 @@ export async function getComponents(token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al obtener componentes');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -178,11 +178,11 @@ export async function createComponent(componentData, token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al crear el componente');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -202,11 +202,11 @@ export async function updateComponent(id, componentData, token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al actualizar el componente');
     }
-    
+
     return data;
   } catch (error) {
     throw error;
@@ -226,11 +226,61 @@ export async function toggleComponentStatus(id, status, token) {
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'Error al cambiar el estado del componente');
     }
-    
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// ============================================
+// USER - Pedidos
+// ============================================
+
+// Obtener todos los pedidos del usuario autenticado
+export async function getUserOrders(token) {
+  try {
+    const response = await fetch(`${API_URL}/orders`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener los pedidos');
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Obtener detalle de un pedido específico
+export async function getUserOrderDetail(id, token) {
+  try {
+    const response = await fetch(`${API_URL}/orders/${id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener el detalle del pedido');
+    }
+
     return data;
   } catch (error) {
     throw error;
