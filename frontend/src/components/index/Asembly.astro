@@ -1,0 +1,70 @@
+---
+const pasos = [
+    {
+        numero: 1,
+        color: "bg-blue-500",
+        titulo: "Entra al Configurador",
+        descripcion: "Accede a nuestra herramienta de configuración",
+        icono: "💻",
+    },
+    {
+        numero: 2,
+        color: "bg-green-500",
+        titulo: "Contesta el Cuestionario",
+        descripcion: "Responde preguntas sobre tu uso y presupuesto",
+        icono: "📝",
+    },
+    {
+        numero: 3,
+        color: "bg-purple-500",
+        titulo: "Solicita el Ensamble",
+        descripcion: "Envía tu solicitud con tu configuración",
+        icono: "🛠️",
+    },
+];
+---
+
+<section class="w-full py-16 flex flex-col items-center" id="Assembly">
+    <h2 class="text-4xl font-bold text-center mb-4">Proceso de Ensamblaje</h2>
+    <p class="text-gray-600 text-center">
+        Sigue estos sencillos pasos y obtén tu computadora personalizada en poco
+        tiempo
+    </p>
+    <div class="w-20 h-1 bg-blue-500 mx-auto rounded-full mt-2 mb-10"></div>
+    <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl"
+    >
+        {
+            pasos.map((p) => (
+                <div class="bg-white shadow-md rounded-xl p-6 flex flex-col items-start gap-4 max-w-[250px]">
+                    <div
+                        class={`w-10 h-10 text-white ${p.color} rounded-lg flex items-center justify-center text-lg font-bold`}
+                    >
+                        {p.numero}
+                    </div>
+
+                    <div class="text-3xl">{p.icono}</div>
+
+                    <h3 class="text-lg font-semibold">{p.titulo}</h3>
+                    <p class="text-gray-600 text-sm">{p.descripcion}</p>
+                </div>
+            ))
+        }
+
+        <!-- Tarjeta final -->
+        <div
+            class="rounded-xl p-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg flex flex-col gap-4"
+        >
+            <div
+                class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-lg font-bold"
+            >
+                ✔
+            </div>
+
+            <div class="text-3xl">😄</div>
+
+            <h3 class="text-lg font-semibold">¡Disfruta!</h3>
+            <p class="text-white/90 text-sm">Tu nuevo compañero está listo</p>
+        </div>
+    </div>
+</section>

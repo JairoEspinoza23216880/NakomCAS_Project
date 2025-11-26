@@ -3,9 +3,13 @@
 ---
 
 <!-- Página de administrador de Usuarios --><!-- Solo usuarios de tipo Vendedor deben entrar -->
-<div id="admin-usuarios" class="p-6 bg-white rounded-lg shadow-md">
-  <h2 class="text-2xl font-semibold mb-4">Administrar Usuarios</h2>
-
+<h2 class="text-3xl font-semibold mb-4 text-center mt-5">
+  Administrar de Usuarios
+</h2>
+<div
+  id="admin-usuarios"
+  class="p-6 bg-white rounded-lg shadow-md max-w-[95%] mx-auto mt-8 mb-10"
+>
   <!-- Mensaje de estado -->
   <div id="mensaje-estado" class="mb-4 hidden">
     <p id="texto-estado" class="text-center py-4"></p>
@@ -61,7 +65,7 @@
   <div class="mt-6">
     <button
       id="btn-crear-usuario"
-      class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
+      class="cursor-pointer bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200"
     >
       Crear Nuevo Usuario
     </button>
@@ -78,8 +82,9 @@
     >
       <div class="p-4 border-b flex justify-between items-center">
         <h3 id="modal-title" class="text-lg font-semibold">Crear Usuario</h3>
-        <button id="modal-close" class="text-gray-500 hover:text-gray-700"
-          >✕</button
+        <button
+          id="modal-close"
+          class="cursor-pointer text-gray-500 hover:text-gray-700">✕</button
         >
       </div>
       <form id="usuario-form" class="p-4 space-y-3">
@@ -138,12 +143,13 @@
           <button
             type="button"
             id="modal-cancel"
-            class="px-4 py-2 rounded border hover:bg-gray-100">Cancelar</button
+            class="cursor-pointer px-4 py-2 rounded border hover:bg-gray-100"
+            >Cancelar</button
           >
           <button
             type="submit"
             id="modal-save"
-            class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            class="cursor-pointer px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
             >Guardar</button
           >
         </div>
@@ -246,8 +252,8 @@
           u.status === "Activo" ? "text-green-600" : "text-red-600";
         const botonEstado =
           u.status === "Activo"
-            ? `<button onclick="cambiarEstado(${u.id}, 'Inactivo')" class="bg-orange-500 text-white px-3 py-1 rounded-lg hover:bg-orange-600 text-sm">Desactivar</button>`
-            : `<button onclick="cambiarEstado(${u.id}, 'Activo')" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm">Activar</button>`;
+            ? `<button onclick="cambiarEstado(${u.id}, 'Inactivo')" class="cursor-pointer bg-orange-500 text-white px-3 py-1 rounded-lg hover:bg-orange-600 text-sm">Desactivar</button>`
+            : `<button onclick="cambiarEstado(${u.id}, 'Activo')" class="cursor-pointer bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm">Activar</button>`;
 
         fila.innerHTML = `
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.id}</td>
@@ -259,7 +265,7 @@
           <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold ${estadoClass}">${u.status}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatearFecha(u.register_date)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <button onclick="editarUsuario(${u.id})" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm mr-2">Editar</button>
+            <button onclick="editarUsuario(${u.id})" class="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 text-sm mr-2">Editar</button>
             ${botonEstado}
           </td>
         `;

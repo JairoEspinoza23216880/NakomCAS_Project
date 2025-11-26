@@ -24,7 +24,7 @@ const { allowedRoles = [], fallbackMessage = "" } = Astro.props;
 }
 
 <script>
-    import { getUserFromStorage, hasRole } from "../lib/auth.js";
+    import { getUserFromStorage, hasRole } from "../../lib/auth.js";
 
     document.addEventListener("DOMContentLoaded", () => {
         const guards = document.querySelectorAll(".role-guard");
