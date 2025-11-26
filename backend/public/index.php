@@ -48,6 +48,7 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 // --- RUTAS DEL API ---
 // ---------------------
 
+
 // Carga rutas desde archivos separados para mejor organización
 $authRoutes = require __DIR__ . '/../app/Routes/auth.php';
 $authRoutes($app);
@@ -55,22 +56,24 @@ $authRoutes($app);
 $configRoutes = require __DIR__ . '/../app/Routes/configurator.php';
 $configRoutes($app);
 
-<<<<<<< HEAD
+// Rutas de administración
 $adminRoutes = require __DIR__ . '/../app/Routes/admin.php';
 $adminRoutes($app);
-=======
+
 $adminOrdersRoutes = require __DIR__ . '/../app/Routes/adminOrders.php';
 $adminOrdersRoutes($app);
->>>>>>> dfc722b37b7d5e80f5d2c260ec61184fbdd1c4f8
 
-$adminComponentsRoutes = require __DIR__ . '/../app/Routes/adminComponents.php';
-$adminComponentsRoutes($app);
+// adminComponents.php está comentado porque admin.php ya maneja las rutas de componentes
+// $adminComponentsRoutes = require __DIR__ . '/../app/Routes/adminComponents.php';
+// $adminComponentsRoutes($app);
 
 $adminUsersRoutes = require __DIR__ . '/../app/Routes/adminUsers.php';
 $adminUsersRoutes($app);
 
+// Rutas de pedidos
 $ordersRoutes = require __DIR__ . '/../app/Routes/orders.php';
 $ordersRoutes($app);
+
 
 // -----------------------
 // --- RUTAS DE PRUEBA ---

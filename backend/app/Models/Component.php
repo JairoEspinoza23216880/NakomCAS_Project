@@ -36,10 +36,4 @@ class Component extends Model
         return $this->belongsToMany(Order::class, 'order_x_components')
             ->withPivot('quantity', 'price_at_purchase');
     }
-
-    // Relación con el tipo de componente
-    public function componentType()
-    {
-        return $this->belongsTo(\App\Models\ComponentType::class, 'component_type_id');
-    }
 }
