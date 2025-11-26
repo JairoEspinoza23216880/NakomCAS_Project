@@ -258,7 +258,7 @@ return function (App $app) {
 
 
             // 3. Buscar el pedido por ID
-            $order = Order::where('id', $orderId)->with('components')->first();
+            $order = Order::where('id', $orderId)->with('components.componentType')->first();
             if (!$order) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -285,6 +285,7 @@ return function (App $app) {
                 $components[] = [
                     'id' => $component->id,
                     'name' => $component->name,
+                    'type_name' => $component->componentType ? $component->componentType->type_name : 'Sin tipo',
                     'quantity' => $pivot->quantity ?? 1,
                     'price_at_purchase' => $pivot->price_at_purchase ?? $component->price
                 ];

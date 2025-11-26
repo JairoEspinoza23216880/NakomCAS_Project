@@ -1,0 +1,353 @@
+---
+
+---
+
+<div class="bg-gray-50 py-10">
+  <div class="w-full max-w-2xl p-8 mx-auto bg-white rounded-lg shadow-xl">
+    <div class="flex items-center mb-6">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-8 h-8 text-orange-500"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+        ></path>
+      </svg>
+      <h2 class="ml-3 text-2xl font-semibold text-gray-800">
+        Formulario de Contacto
+      </h2>
+    </div>
+
+    <form id="contactForm" class="space-y-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <label
+            for="name"
+            class="block mb-2 text-sm font-medium text-gray-600"
+          >
+            Nombre completo
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Cargando..."
+            class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+            readonly
+          />
+        </div>
+
+        <div>
+          <label
+            for="email"
+            class="block mb-2 text-sm font-medium text-gray-600"
+          >
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Cargando..."
+            class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+            readonly
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="phone" class="block mb-2 text-sm font-medium text-gray-600">
+          Teléfono
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="Cargando..."
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+          readonly
+        />
+      </div>
+
+      <div>
+        <span class="block mb-2 text-sm font-medium text-gray-600">
+          Tipo de Consulta
+        </span>
+        <div class="flex flex-wrap gap-3 justify-center items-center">
+          <input
+            type="radio"
+            id="cotizacion"
+            name="queryType"
+            value="Cotizacion"
+            class="hidden"
+            checked
+          />
+          <label
+            for="cotizacion"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Cotización
+          </label>
+
+          <input
+            type="radio"
+            id="soporte"
+            name="queryType"
+            value="Soporte"
+            class="hidden"
+          />
+          <label
+            for="soporte"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Soporte
+          </label>
+
+          <input
+            type="radio"
+            id="info"
+            name="queryType"
+            value="Informacion General"
+            class="hidden"
+          />
+          <label
+            for="info"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Información General
+          </label>
+
+          <input
+            type="radio"
+            id="otro"
+            name="queryType"
+            value="Otro"
+            class="hidden"
+          />
+          <label
+            for="otro"
+            class="radio-label px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Otro
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="subject"
+          class="block mb-2 text-sm font-medium text-gray-600"
+        >
+          Asunto
+        </label>
+        <input
+          type="text"
+          id="subject"
+          name="subject"
+          placeholder="Título de Asunto"
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+          required
+        />
+      </div>
+
+      <div>
+        <label
+          for="message"
+          class="block mb-2 text-sm font-medium text-gray-600"
+        >
+          Mensaje
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          rows="5"
+          placeholder="Escribe tu mensaje aquí."
+          class="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white"
+          required></textarea>
+      </div>
+
+      <div class="flex items-center">
+        <input
+          id="terms"
+          name="terms"
+          type="checkbox"
+          class="w-5 h-5 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500"
+          required
+        />
+        <label for="terms" class="ml-2 text-sm text-gray-600">
+          Acepto los términos y condiciones.
+        </label>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="cursor-pointer w-full px-6 py-3 font-semibold text-white bg-gray-800 rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 transition-colors duration-300"
+        >
+          Enviar Mensaje
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div
+  id="successModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4 transform transition-all"
+  >
+    <div class="text-center">
+      <!-- Icono de éxito -->
+      <div
+        class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4"
+      >
+        <svg
+          class="h-10 w-10 text-green-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+
+      <h3 class="text-2xl font-semibold text-gray-900 mb-2">
+        ¡Mensaje NO Enviado!
+      </h3>
+
+      <p class="text-gray-600 mb-6">
+        Tu mensaje no ha sido enviado con éxito. Por lo tanto, no nos pondremos
+        en contacto contigo pronto.
+      </p>
+
+      <button
+        onclick="closeSuccessModal()"
+        class="w-full px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors duration-300"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Obtener el token del localStorage
+  function getToken() {
+    return localStorage.getItem("authToken");
+  }
+
+  // Cargar datos del usuario desde la API
+  async function loadUserData() {
+    const token = getToken();
+
+    if (!token) {
+      console.warn("No hay token de autenticación");
+      document.getElementById("name").placeholder = "Nombre completo";
+      document.getElementById("email").placeholder = "correo@ejemplo.com";
+      document.getElementById("phone").placeholder = "(999) 123-4567";
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8000/api/user/profile", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al cargar datos del usuario");
+      }
+
+      const data = await response.json();
+      const user = data.user;
+
+      // Rellenar los campos con los datos del usuario
+      document.getElementById("name").value = `${user.name} ${user.lastname}`;
+      document.getElementById("email").value = user.email;
+      document.getElementById("phone").value = user.phone_number || "";
+    } catch (error) {
+      console.error("Error al cargar datos del usuario:", error);
+      document.getElementById("name").placeholder = "Nombre completo";
+      document.getElementById("email").placeholder = "correo@ejemplo.com";
+      document.getElementById("phone").placeholder = "(999) 123-4567";
+    }
+  }
+
+  // Actualizar estilos de los radio buttons
+  function updateRadioStyles() {
+    const radioInputs = document.querySelectorAll('input[name="queryType"]');
+    const radioLabels = document.querySelectorAll(".radio-label");
+
+    radioLabels.forEach((label, index) => {
+      const input = radioInputs[index];
+
+      if (input.checked) {
+        label.classList.remove("bg-gray-100", "text-gray-700");
+        label.classList.add("bg-orange-500", "text-white");
+      } else {
+        label.classList.remove("bg-orange-500", "text-white");
+        label.classList.add("bg-gray-100", "text-gray-700");
+      }
+    });
+  }
+
+  // Mostrar modal de éxito
+  function showSuccessModal() {
+    document.getElementById("successModal").classList.remove("hidden");
+  }
+
+  // Cerrar modal de éxito
+  function closeSuccessModal() {
+    document.getElementById("successModal").classList.add("hidden");
+    // Limpiar campos editables
+    document.getElementById("subject").value = "";
+    document.getElementById("message").value = "";
+    document.getElementById("terms").checked = false;
+    // Resetear tipo de consulta al primero
+    document.getElementById("cotizacion").checked = true;
+    updateRadioStyles();
+  }
+
+  // Manejar el envío del formulario
+  document
+    .getElementById("contactForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Mostrar modal de éxito (sin enviar datos realmente)
+      showSuccessModal();
+    });
+
+  // Event listeners para los radio buttons
+  document.querySelectorAll('input[name="queryType"]').forEach((radio) => {
+    radio.addEventListener("change", updateRadioStyles);
+  });
+
+  // Inicializar al cargar la página
+  window.addEventListener("DOMContentLoaded", () => {
+    loadUserData(); // Cargar datos del usuario desde la API
+    updateRadioStyles();
+  });
+</script>
+
+<style>
+  .radio-label {
+    user-select: none;
+  }
+</style>

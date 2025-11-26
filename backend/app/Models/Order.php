@@ -18,8 +18,10 @@ class Order extends Model
         'status'
     ];
 
-    // Desactivar timestamps automáticos (solo existe created_at en la tabla)
-    public $timestamps = false;
+    // Habilitar timestamps (solo existe created_at en la tabla)
+    public $timestamps = true;
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = null; // No existe updated_at en la tabla
 
 
     // RELACIONES

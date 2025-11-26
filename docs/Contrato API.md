@@ -82,7 +82,7 @@
 ``` json
 {
   "selected_needs_n_boosters": [(1,0),(5,2)], // Array de Tuplas : IDs de las Necesidades junto a su Booster
-  "selected_personalization_ids": [1, 3, 2], // IDs de personalización (ej. 2TB SSD, Gabinete Grande, Conectividad WIFI)
+  "selected_personalization_ids": [1, 3, 2] // IDs de personalización (ej. 2TB SSD, Gabinete Grande, Conectividad WIFI)
 }
 ```
 

@@ -1,181 +1,612 @@
 ---
 const { selected = "" } = Astro.props;
+import Basic from "./ConfiguracionComponents/Basic.astro";
+import Gaming from "./ConfiguracionComponents/Gaming.astro";
+import Audiovisual from "./ConfiguracionComponents/Audiovisual.astro";
+import Workstation from "./ConfiguracionComponents/Workstation.astro";
 ---
 
-<div class="w-full flex gap-6 p-6 min-h-screen max-w-6xl mx-auto">
-  <!-- Sidebar -->
-  <aside class="flex flex-col gap-6">
+<div class="w-full flex gap-6 p-6 px-20 min-h-screen max-w-full mx-auto">
+  <!-- Sidebar para seleccionar el formulario -->
+  <aside
+    id="menu-botones"
+    data-selected={selected}
+    class="flex flex-col gap-6 my-auto"
+  >
     <button
-      class="p-4 rounded-xl border cursor-pointer hover:bg-gray-200"
-      onclick="swapForm('basic')"
+      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 boton-formulario"
+      data-form="basic"
     >
-      A
+      <img
+        src="../../public/img/Configuracion.png"
+        alt="Configuración básica"
+        class="opacity-60 transition-opacity duration-200"
+      />
     </button>
     <button
-      class="p-4 rounded-xl border cursor-pointer hover:bg-gray-200"
-      onclick="swapForm('gaming')"
+      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+      data-form="gaming"
     >
-      B
+      <img
+        src="../../public/img/Gaming.png"
+        alt="Gaming"
+        class="opacity-60 transition-opacity duration-200"
+      />
     </button>
     <button
-      class="p-4 rounded-xl border cursor-pointer hover:bg-gray-200"
-      onclick="swapForm('monitor')"
+      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+      data-form="monitor"
     >
-      C
+      <img
+        src="../../public/img/Audiovisual.png"
+        alt="Audiovisuales"
+        class="opacity-60 transition-opacity duration-200"
+      />
     </button>
     <button
-      class="p-4 rounded-xl border cursor-pointer hover:bg-gray-200"
-      onclick="swapForm('dev')"
+      class="p-4 rounded-xl border cursor-pointer h-25 w-25 transition-colors duration-200 hover:bg-gray-200 boton-formulario"
+      data-form="dev"
     >
-      D
+      <img
+        src="../../public/img/Trabajo.png"
+        alt="Trabajo"
+        class="opacity-60 transition-opacity duration-200"
+      />
     </button>
   </aside>
 
   <!-- Main Container -->
-    <section class="flex-1 bg-white p-10 rounded-2xl shadow mx-10">
-        <div id="form-area">
-            <h2 class="text-4xl font-bold mb-6 text-center">Configuracion Basica</h2>
-            <div class="flex flex-col gap-4">
-                <label class="font-semibold">Color</label>
-                <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                    <option value="Selecciona un color">Selecciona una opcion</option>
-                    <option value="negro">Negro</option>
-                    <option value="blanco">Blanco</option>
-                </select>
+  <section class="flex-1 bg-white p-5 rounded-2xl shadow mx-5">
+    <div id="form-area" data-selected={selected}>
+      <!-- Cada formulario se renderiza server-side como un panel.
+            El script cliente solo muestra/oculta los paneles por `data-form`.
+            Así podemos incluir componentes Astro (ej: <Prueba/>) dentro del panel `dev`.-->
 
-                <label class="font-semibold">Almacenamiento</label>
-                <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                    <option value="">Seleccione una opcion</option>
-                    <option value=""></option>
-                    <option value=""></option>
-                </select>
+      <div class="form-panel" data-form="basic">
+        <Basic />
+      </div>
 
-                <label class="font-semibold">Tamanio</label>
-                <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                    <option value="">Seleccione una opcion</option>
-                    <option value=""></option>
-                    <option value=""></option>
-                </select>
+      <div class="form-panel hidden" data-form="gaming">
+        <Gaming />
+      </div>
 
-                <label class="font-semibold">Conectividad</label>
-                <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                    <option value="">Seleccione una opcion</option>
-                    <option value=""></option>
-                    <option value=""></option>
-                </select>
+      <div class="form-panel hidden" data-form="monitor">
+        <Audiovisual />
+      </div>
 
-                <label class="font-semibold">Perifericos</label>
-                <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                    <option value="">Seleccione una opcion</option>
-                    <option value=""></option>
-                    <option value=""></option>
-                </select>
+      <div class="form-panel hidden" data-form="dev">
+        <Workstation />
+      </div>
+    </div>
+  </section>
 
-                <label class="font-semibold">Comentario Adicional</label>
-                <textarea class=" w-2xl bg-gray-200 h-32" placeholder="Escribe tu comentario"></textarea>
-            </div>
+  <section
+    class="flex-1 bg-white rounded-2xl p-5 shadow max-w-sm max-h-screen-sm mx-5 items-center my-auto"
+  >
+    <h2 class="text-center text-xl font-bold text-gray-800 mb-2">
+      Tu PC Recomendada
+    </h2>
+
+    <!-- Mensaje de estado -->
+    <div id="mensaje-estado" class="mb-4 hidden">
+      <p id="texto-estado" class="text-center py-2 text-sm"></p>
+    </div>
+
+    <div id="resumenConfiguracion" class="space-y-4">
+      <div
+        id="placeholder-inicial"
+        class="flex flex-col items-center justify-center text-gray-500 py-20"
+      >
+        <svg
+          class="w-16 h-16 mb-4 text-gray-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          ></path>
+        </svg>
+        <p class="mt-4 text-center text-sm">
+          Selecciona tus necesidades<br />para ver tu PC ideal
+        </p>
+      </div>
+
+      <!-- Contenedor de resultados (oculto inicialmente) -->
+      <div id="resultado-pc" class="hidden">
+        <!-- Precio Total -->
+        <div
+          class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg mb-4"
+        >
+          <p class="text-sm opacity-90">Precio Total</p>
+          <p id="precio-total" class="text-3xl font-bold">$0.00</p>
         </div>
-    </section>
+
+        <!-- Kit Funcional -->
+        <div class="mb-4">
+          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+              ></path>
+            </svg>
+            Kit Funcional
+          </h3>
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <p
+              id="functional-kit-name"
+              class="text-sm font-medium text-gray-800 mb-1"
+            >
+            </p>
+            <p id="functional-kit-price" class="text-xs text-gray-600 mb-2"></p>
+            <div
+              id="functional-components"
+              class="text-xs text-gray-600 space-y-1"
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- Kit Estructural -->
+        <div class="mb-4" id="structural-kit-container">
+          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"
+                clip-rule="evenodd"></path>
+            </svg>
+            Kit Estructural
+          </h3>
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <p
+              id="structural-kit-name"
+              class="text-sm font-medium text-gray-800 mb-1"
+            >
+            </p>
+            <p id="structural-kit-price" class="text-xs text-gray-600 mb-2"></p>
+            <div
+              id="structural-components"
+              class="text-xs text-gray-600 space-y-1"
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- Personalizaciones -->
+        <div
+          class="mb-4"
+          id="personalizations-container"
+          style="display: none;"
+        >
+          <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
+              ></path>
+            </svg>
+            Personalizaciones
+          </h3>
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <div
+              id="personalization-components"
+              class="text-xs text-gray-600 space-y-1"
+            >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="mt-3 justify-center flex flex-col gap-2">
+      <button
+        id="btnBuscar"
+        class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Buscar PC Ideal
+      </button>
+      <button
+        id="btnPedido"
+        class="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden"
+      >
+        Realizar Pedido
+      </button>
+    </div>
+  </section>
 </div>
 
 <!-- SCRIPT FUNCIONAL -->
-<script is:raw>
-  const formsHTML = {
-    basic: `
-        <h2 class="text-4xl font-bold mb-6 text-center">Configuracion Basica</h2>
-        <div class="flex flex-col gap-4">
-            <label class="font-semibold">Color</label>
-            <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                <option value="Selecciona un color">Selecciona una opcion</option>
-                <option value="negro">Negro</option>
-                <option value="blanco">Blanco</option>
-            </select>
+<script>
+  import {
+    needsMapping,
+    personalizationMapping,
+  } from "../utils/configuratorMappings.js";
 
-            <label class="font-semibold">Almacenamiento</label>
-            <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                <option value="">Seleccione una opcion</option>
-                <option value=""></option>
-                <option value=""></option>
-            </select>
+  // Variable global para almacenar la configuración actual
+  let currentBuild = null;
 
-            <label class="font-semibold">Tamanio</label>
-            <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                <option value="">Seleccione una opcion</option>
-                <option value=""></option>
-                <option value=""></option>
-            </select>
-
-            <label class="font-semibold">Conectividad</label>
-            <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                <option value="">Seleccione una opcion</option>
-                <option value=""></option>
-                <option value=""></option>
-            </select>
-
-            <label class="font-semibold">Perifericos</label>
-            <select class="w-2xl bg-gray-200 rounded-sm p-2 cursor-pointer">
-                <option value="">Seleccione una opcion</option>
-                <option value=""></option>
-                <option value=""></option>
-            </select>
-
-            <label class="font-semibold">Comentario Adicional</label>
-            <textarea class=" w-2xl bg-gray-200 h-32" placeholder="Escribe tu comentario"></textarea>
-        </div>
-    `,
-
-    gaming: `
-      <h2 class='text-2xl font-bold mb-6 text-center text-orange-500 flex items-center gap-2'>
-        🎮 Gaming
-      </h2>
-      <div class='grid grid-cols-2 gap-6'>
-        <div>
-          <h3 class='font-semibold mb-2'>Tipo de Juego</h3>
-          <div class='flex flex-col gap-3'>
-            <label class='flex items-center gap-2'><input type='checkbox'/> Emulación Retro</label>
-            <label class='flex items-center gap-2'><input type='checkbox'/> Indies</label>
-            <label class='flex items-center gap-2'><input type='checkbox'/> Emulación Moderna</label>
-            <label class='flex items-center gap-2'><input type='checkbox'/> AAA</label>
-          </div>
-        </div>
-
-        <div>
-          <h3 class='font-semibold mb-2'>Resolución</h3>
-          <div class='bg-gray-200 p-4 rounded-xl flex flex-col gap-4'>
-            <div>
-              <label class='block text-sm mb-1'>Resolución Esperada</label>
-              <input class='w-full bg-gray-300 rounded p-2' />
-            </div>
-            <div>
-              <label class='block text-sm mb-1'>FPS Deseados</label>
-              <input class='w-full bg-gray-300 rounded p-2' />
-            </div>
-          </div>
-          <p class='mt-4'>Mayor enfriamiento</p>
-        </div>
-      </div>
-
-      <div class='mt-6'>
-        <h3 class='font-semibold mb-2'>Juego Específico</h3>
-        <textarea class='w-full bg-gray-200 rounded-xl p-4 h-32'></textarea>
-      </div>
-    `,
-
-    monitor: `
-      <h2 class='text-2xl font-bold mb-6 text-center text-green-500'>Monitor</h2>
-      <p>Formulario Monitor aquí...</p>
-    `,
-
-    dev: `
-      <h2 class='text-2xl font-bold mb-6 text-center text-purple-500'>Desarrollo</h2>
-      <p>Formulario Dev aquí...</p>
-    `,
-  };
-
+  // Función para cambiar entre formularios
   function swapForm(name) {
-    const element = document.getElementById("form-area");
-    if (element && formsHTML[name]) {
-      element.innerHTML = formsHTML[name];
+    const area = document.getElementById("form-area");
+    if (!area) return;
+    const panels = Array.from(area.querySelectorAll(".form-panel"));
+    panels.forEach((p) => {
+      if (p.dataset.form === name) {
+        p.classList.remove("hidden");
+      } else {
+        p.classList.add("hidden");
+      }
+    });
+  }
+
+  // Mostrar/ocultar mensaje de estado
+  function mostrarMensaje(texto, tipo = "info") {
+    const mensajeDiv = document.getElementById("mensaje-estado");
+    const textoP = document.getElementById("texto-estado");
+
+    textoP.textContent = texto;
+    mensajeDiv.classList.remove("hidden");
+
+    if (tipo === "error") {
+      textoP.className = "text-center py-2 text-sm text-red-600";
+    } else if (tipo === "success") {
+      textoP.className = "text-center py-2 text-sm text-green-600";
+    } else {
+      textoP.className = "text-center py-2 text-sm text-gray-600";
     }
   }
+
+  function ocultarMensaje() {
+    document.getElementById("mensaje-estado").classList.add("hidden");
+  }
+
+  // Limpiar resultados anteriores
+  function clearResults() {
+    // Ocultar resultados anteriores
+    document.getElementById("resultado-pc").classList.add("hidden");
+    document.getElementById("btnPedido").classList.add("hidden");
+
+    // Mostrar placeholder inicial
+    document.getElementById("placeholder-inicial").classList.remove("hidden");
+
+    // Limpiar variable global
+    currentBuild = null;
+  }
+
+  // Recolectar datos de todos los formularios
+  function collectFormData() {
+    const needsAndBoosters = [];
+    const personalizations = [];
+
+    // Recolectar de todos los selects con data-need
+    const needSelects = document.querySelectorAll("select[data-need]");
+    needSelects.forEach((select) => {
+      if (select.value && select.value !== "") {
+        const needName = select.getAttribute("data-need");
+        const key = `${needName}-${select.value}`;
+        const mapping = needsMapping[key];
+
+        if (mapping) {
+          needsAndBoosters.push([mapping.need_id, mapping.booster_id]);
+        }
+      }
+    });
+
+    // Recolectar personalizaciones
+    const personalizationSelects = document.querySelectorAll(
+      "select[data-personalization]",
+    );
+    personalizationSelects.forEach((select) => {
+      if (select.value && select.value !== "") {
+        const personalizationId = personalizationMapping[select.value];
+        if (personalizationId) {
+          personalizations.push(personalizationId);
+        }
+      }
+    });
+
+    return {
+      selected_needs_n_boosters: needsAndBoosters,
+      selected_personalization_ids: personalizations,
+    };
+  }
+
+  // Buscar configuración en el API
+  async function searchConfiguration() {
+    const data = collectFormData();
+
+    // Validar que haya al menos una necesidad seleccionada
+    if (data.selected_needs_n_boosters.length === 0) {
+      mostrarMensaje("Por favor selecciona al menos una necesidad", "error");
+      return;
+    }
+
+    mostrarMensaje("Buscando tu PC ideal...", "info");
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/configurator/search",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message ||
+              "No se encontró una PC que cumpla los requisitos",
+          );
+        }
+        throw new Error(`Error al buscar configuración: ${response.status}`);
+      }
+
+      const result = await response.json();
+      currentBuild = result;
+      displayResults(result);
+      ocultarMensaje();
+    } catch (error) {
+      console.error("Error:", error);
+      clearResults(); // Limpiar resultados anteriores
+      mostrarMensaje(error.message, "error");
+    }
+  }
+
+  // Mostrar resultados visualmente
+  function displayResults(result) {
+    // Ocultar placeholder y mostrar resultados
+    document.getElementById("placeholder-inicial").classList.add("hidden");
+    document.getElementById("resultado-pc").classList.remove("hidden");
+    document.getElementById("btnPedido").classList.remove("hidden");
+
+    // Mostrar precio total
+    document.getElementById("precio-total").textContent =
+      `$${result.total_price.toFixed(2)}`;
+
+    // Mostrar Kit Funcional
+    const functionalKit = result.build.functional_kit;
+    document.getElementById("functional-kit-name").textContent =
+      functionalKit.name || "Kit Funcional";
+    document.getElementById("functional-kit-price").textContent =
+      `$${functionalKit.calculated_price.toFixed(2)}`;
+
+    const functionalComponentsDiv = document.getElementById(
+      "functional-components",
+    );
+    functionalComponentsDiv.innerHTML = "";
+    if (
+      functionalKit.components_list &&
+      functionalKit.components_list.length > 0
+    ) {
+      functionalKit.components_list.forEach((comp) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between";
+        div.innerHTML = `
+          <span>• ${comp.name}</span>
+          <span class="text-gray-500">${comp.quantity}x</span>
+        `;
+        functionalComponentsDiv.appendChild(div);
+      });
+    }
+
+    // Mostrar Kit Estructural
+    const structuralKit = result.build.structural_kit;
+    if (structuralKit) {
+      document.getElementById("structural-kit-container").style.display =
+        "block";
+      document.getElementById("structural-kit-name").textContent =
+        structuralKit.name || "Kit Estructural";
+      document.getElementById("structural-kit-price").textContent =
+        `$${structuralKit.calculated_price.toFixed(2)}`;
+
+      const structuralComponentsDiv = document.getElementById(
+        "structural-components",
+      );
+      structuralComponentsDiv.innerHTML = "";
+      if (
+        structuralKit.components_list &&
+        structuralKit.components_list.length > 0
+      ) {
+        structuralKit.components_list.forEach((comp) => {
+          const div = document.createElement("div");
+          div.className = "flex justify-between";
+          div.innerHTML = `
+            <span>• ${comp.name}</span>
+            <span class="text-gray-500">${comp.quantity}x</span>
+          `;
+          structuralComponentsDiv.appendChild(div);
+        });
+      }
+    } else {
+      document.getElementById("structural-kit-container").style.display =
+        "none";
+    }
+
+    // Mostrar Personalizaciones
+    const personalizations = result.build.personalization_components;
+    if (personalizations && personalizations.length > 0) {
+      document.getElementById("personalizations-container").style.display =
+        "block";
+      const personalizationComponentsDiv = document.getElementById(
+        "personalization-components",
+      );
+      personalizationComponentsDiv.innerHTML = "";
+      personalizations.forEach((comp) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between";
+        div.innerHTML = `
+          <span>• ${comp.name}</span>
+          <span class="text-gray-500">$${(comp.price || 0).toFixed(2)}</span>
+        `;
+        personalizationComponentsDiv.appendChild(div);
+      });
+    } else {
+      document.getElementById("personalizations-container").style.display =
+        "none";
+    }
+  }
+
+  // Crear pedido
+  async function createOrder() {
+    if (!currentBuild) {
+      alert("Primero debes buscar una configuración");
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      if (
+        confirm(
+          "Debes iniciar sesión para realizar un pedido. ¿Deseas ir a la página de login?",
+        )
+      ) {
+        window.location.href = "/Login";
+      }
+      return;
+    }
+
+    // Validar que el token sea válido antes de crear el pedido
+    mostrarMensaje("Validando sesión...", "info");
+
+    try {
+      // Primero validamos el token con /api/me
+      const validateResponse = await fetch("http://localhost:8000/api/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!validateResponse.ok) {
+        // Token inválido o expirado
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+
+        if (
+          confirm(
+            "Tu sesión ha expirado. Por favor inicia sesión nuevamente. ¿Deseas ir a la página de login?",
+          )
+        ) {
+          window.location.href = "/Login";
+        }
+        return;
+      }
+
+      // Token válido, procedemos a crear el pedido
+      mostrarMensaje("Creando pedido...", "info");
+
+      const orderData = {
+        functional_kit_id: currentBuild.build.functional_kit.id,
+        structural_kit_id: currentBuild.build.structural_kit
+          ? currentBuild.build.structural_kit.id
+          : null,
+        personalization_ids: currentBuild.build.personalization_components.map(
+          (p) => p.id,
+        ),
+        total_price: currentBuild.total_price,
+      };
+
+      const response = await fetch("http://localhost:8000/api/orders", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || `Error al crear pedido: ${response.status}`,
+        );
+      }
+
+      const result = await response.json();
+      mostrarMensaje("¡Pedido creado exitosamente!", "success");
+
+      setTimeout(() => {
+        if (confirm("Pedido creado con éxito. ¿Deseas ver tus pedidos?")) {
+          window.location.href = "/UserOrder";
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Error:", error);
+      mostrarMensaje(error.message, "error");
+    }
+  }
+
+  // Manejo del estado activo en el aside (resalta la imagen seleccionada)
+  (function () {
+    const menu = document.getElementById("menu-botones");
+    if (!menu) return;
+
+    const buttons = Array.from(menu.querySelectorAll(".boton-formulario"));
+    const initial = (
+      localStorage.getItem("configSelected") ||
+      menu.dataset.selected ||
+      "basic"
+    )
+      .replace(/[{}]/g, "")
+      .trim();
+
+    function setActive(targetBtn) {
+      buttons.forEach((btn) => {
+        btn.classList.remove("ring-2", "ring-gray-400", "bg-gray-100");
+        const img = btn.querySelector("img");
+        if (img) img.classList.remove("opacity-100");
+      });
+
+      if (!targetBtn) return;
+      targetBtn.classList.add("ring-2", "ring-gray-400", "bg-gray-100");
+      const img = targetBtn.querySelector("img");
+      if (img) img.classList.add("opacity-100");
+    }
+
+    // Inicializar estado activo
+    const initBtn =
+      buttons.find((b) => b.dataset.form === initial) || buttons[0];
+    setActive(initBtn);
+    // Mostrar form inicial
+    if (initBtn && initBtn.dataset && initBtn.dataset.form)
+      swapForm(initBtn.dataset.form);
+
+    // Añadir listeners a cada botón
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const name = btn.dataset.form;
+        setActive(btn);
+        if (name) {
+          swapForm(name);
+          try {
+            localStorage.setItem("configSelected", name);
+          } catch (err) {
+            /* ignore */
+          }
+        }
+      });
+    });
+
+    // Event listeners para botones de acción
+    const btnBuscar = document.getElementById("btnBuscar");
+    const btnPedido = document.getElementById("btnPedido");
+
+    if (btnBuscar) {
+      btnBuscar.addEventListener("click", searchConfiguration);
+    }
+
+    if (btnPedido) {
+      btnPedido.addEventListener("click", createOrder);
+    }
+  })();
 </script>

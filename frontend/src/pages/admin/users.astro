@@ -1,0 +1,15 @@
+---
+import AdministratorUsersComponent from "../../components/admin/AdministratorUsers.astro";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Administración de Usuarios">
+    <AdministratorUsersComponent />
+</Layout>
+
+<script>
+    import { protectRoute, ROLES } from "../../lib/auth.js";
+
+    // Proteger esta ruta - solo admin/vendedor
+    protectRoute([ROLES.ADMIN_VENDEDOR]);
+</script>

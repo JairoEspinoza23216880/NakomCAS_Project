@@ -17,6 +17,11 @@ class ComponentType extends Model
     // Desactivar timestamps si no se usan
     public $timestamps = false;
 
+    // ACCESSOR para compatibilidad con API
+    public function getNameAttribute()
+    {
+        return $this->attributes['type_name'] ?? null;
+    }
 
     // RELACIONES
     // Un Tipo tiene muchos Componentes

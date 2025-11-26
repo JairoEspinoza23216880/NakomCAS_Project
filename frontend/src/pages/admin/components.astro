@@ -1,0 +1,15 @@
+---
+import ComponentsView from "../../components/admin/Components.astro";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Administración de Componentes">
+    <ComponentsView client:load />
+</Layout>
+
+<script>
+    import { protectRoute, ROLES } from "../../lib/auth.js";
+
+    // Proteger esta ruta - solo admin/vendedor
+    protectRoute([ROLES.ADMIN_VENDEDOR]);
+</script>

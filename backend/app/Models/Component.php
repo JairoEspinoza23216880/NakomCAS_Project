@@ -24,16 +24,16 @@ class Component extends Model
     public $timestamps = false;
 
     // RELACIONES
+    // Un Componente pertenece a un Tipo
+    public function componentType()
+    {
+        return $this->belongsTo(ComponentType::class, 'component_type_id');
+    }
+    
     // Varios Componentes pertenecen a varias Órdenes
     public function orders()
     {
         return $this->belongsToMany(Order::class, 'order_x_components')
             ->withPivot('quantity', 'price_at_purchase');
-    }
-
-    // Relación con el tipo de componente
-    public function componentType()
-    {
-        return $this->belongsTo(\App\Models\ComponentType::class, 'component_type_id');
     }
 }
